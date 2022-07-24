@@ -24,7 +24,7 @@ class RecycleScreen extends ConsumerWidget with RecycleView {
           scaffoldKey: _scaffoldKey,
           appBar: KAppBar(
             backgroundColor: KAColors.appMainLightColor,
-            title: const Text("Sales"),
+            title: const Text("Recycle"),
           ),
           builder: (_) => Column(
             children: [
@@ -32,12 +32,14 @@ class RecycleScreen extends ConsumerWidget with RecycleView {
                 height: 20,
               ),
               KAForm(
+                keyboardType: TextInputType.number,
                 title: "Material Input (KG)",
                 onChange: (v) {
                   controller.recycleSetModel.itemWeightInput = v;
                 },
               ),
               KAForm(
+                keyboardType: TextInputType.number,
                 title: "Material Output(KG)",
                 onChange: (v) {
                   controller.recycleSetModel.itemWeightOutput = v;

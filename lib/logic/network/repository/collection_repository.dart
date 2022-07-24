@@ -13,7 +13,7 @@ class CollectionRepository {
   }
 
   static Future<CollectionItemResponse> getCollectionItemList() async {
-    var response = await ServerData().getData(path: APIRoute.getCollection);
+    var response = await ServerData().getData(path: APIRoute.itemList);
     return CollectionItemResponse.fromJson(response.data);
   }
 }

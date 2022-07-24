@@ -1,16 +1,37 @@
+import 'dart:developer';
+
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:kaltani_ms/ui_layer/auth/sign_up_page.dart';
 import 'package:kaltani_ms/ui_layer/dashboard/dashboard.dart';
+import 'package:kaltani_ms/ui_layer/pages/transfer_screen.dart';
 import 'package:kaltani_ms/utils/colors.dart';
 
 import 'logic/local_storage.dart';
+import 'logic/network/repository/setting_repository.dart';
 
-void main() {
+Future<void> _messageHandler(RemoteMessage message) async {
+  print('background message MIMI ${message.notification!.body}');
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.onBackgroundMessage(_messageHandler);
+
   runApp(const ProviderScope(
     child: MyApp(),
   ));
+}
+
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  print('Handling a background message ${message.messageId}');
 }
 
 class MyApp extends StatelessWidget {
@@ -42,8 +63,27 @@ class ThemeWidget extends StatefulWidget {
 
 class _ThemeWidgetState extends State<ThemeWidget> {
   @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+    firesBaseSetUp();
+  }
+
+  firesBaseSetUp() async {
+    var token = await FirebaseMessaging.instance.getToken();
+    SettingRepository.sortItem({"device_id": token});
+    FirebaseMessaging.onMessage.listen((RemoteMessage event) {});
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      log('Message clicked!');
+      Get.to(() => const TransferScreen());
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       builder: (context, widget) {
         ScreenUtil.init(context);
         return widget!;

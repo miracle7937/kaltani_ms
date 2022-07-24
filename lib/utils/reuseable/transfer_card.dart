@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kaltani_ms/utils/reuseable/card_bg.dart';
 
+import '../../logic/model/transfer_list_model.dart';
 import '../colors.dart';
 
 class TransferCard extends StatelessWidget {
-  const TransferCard({Key? key}) : super(key: key);
+  final TransferHistory? transferData;
+  const TransferCard({Key? key, this.transferData}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,26 +20,13 @@ class TransferCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  "KLY44633744",
+                  transferData?.id.toString() ?? "",
                   style: Theme.of(context).textTheme.headline1!.copyWith(
                       fontWeight: FontWeight.w400,
                       color: KAColors.appGreyColor),
                 ),
                 const Spacer(),
-                Container(
-                  decoration: BoxDecoration(
-                      color: Colors.deepOrange,
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      "Pending",
-                      style: Theme.of(context).textTheme.headline1!.copyWith(
-                          fontWeight: FontWeight.w400,
-                          color: KAColors.appWhiteColor),
-                    ),
-                  ),
-                )
+                statusWidget(context, transferData?.status!, () {})
               ],
             ),
             Row(
@@ -51,7 +41,7 @@ class TransferCard extends StatelessWidget {
                   children: [
                     _tile(context,
                         title: "Collection Center",
-                        value: "Oshodi Collection Center"),
+                        value: transferData?.location?.name ?? ""),
                     const SizedBox(
                       height: 25,
                     ),
@@ -63,9 +53,11 @@ class TransferCard extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _tile(context,
-                            title: "Factory", value: "Sagamu Factory"),
+                            title: "Factory",
+                            value: transferData?.factory?.name ?? ""),
                         Text(
-                          "22/06/2022",
+                          DateFormat('yMd').format(DateTime.parse(
+                              transferData!.location!.createdAt!)),
                           style: Theme.of(context)
                               .textTheme
                               .headline1!
@@ -80,6 +72,40 @@ class TransferCard extends StatelessWidget {
               ],
             )
           ],
+        ),
+      ),
+    );
+  }
+
+  statusWidget(BuildContext context, status, VoidCallback callback) {
+    Color? color;
+    String? text;
+    if (status == "0") {
+      color = Colors.orangeAccent;
+      text = "Pending";
+    } else if (status == "1") {
+      color = Colors.green;
+      text = "Completed";
+    } else {
+      color = Colors.red;
+      text = "Rejected";
+    }
+    return InkWell(
+      onTap: () {
+        if (status == "0") {
+          callback();
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+            color: color, borderRadius: BorderRadius.circular(30)),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Text(
+            text ?? "",
+            style: Theme.of(context).textTheme.headline1!.copyWith(
+                fontWeight: FontWeight.w400, color: KAColors.appWhiteColor),
+          ),
         ),
       ),
     );

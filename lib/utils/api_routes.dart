@@ -6,7 +6,12 @@ class APIRoute {
   static String itemList = "$base/itemList";
   static String sales = "$base/sales";
   static String sorting = "$base/sorting";
+  static String getSorting = "$base/getSorting";
+  static String getBailing = "$base/getBailing";
+  static String bailing = "$base/bailing";
   static String recycle = "$base/recycle";
+  static String getTransfer = "$base/getTransfer";
+  static String deviceId = "$base/deviceId";
   static String logToSlack =
-      "https://hooks.slack.com/services/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";
+      "https://hooks.slack.com/services/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";
 }

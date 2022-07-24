@@ -40,7 +40,11 @@ class EPPageStateWidget extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               child: Center(
-                child: Lottie.asset(KAImages.loader),
+                child: SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: Lottie.asset(KAImages.loader),
+                ),
               ),
             );
 

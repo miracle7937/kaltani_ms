@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.kaltani_ms">
+    package="com.kaltani.ms">
    <application
         android:label="kaltani_ms"
         android:name="${applicationName}"
