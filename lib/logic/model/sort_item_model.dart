@@ -1,10 +1,10 @@
-class SortedItem {
+class SetItem {
   String? sortItem;
   String? sortItemWeight;
   String? itemName;
-  SortedItem({this.sortItem, this.sortItemWeight, this.itemName});
+  SetItem({this.sortItem, this.sortItemWeight, this.itemName});
 
-  SortedItem.fromJson(Map<String, dynamic> json) {
+  SetItem.fromJson(Map<String, dynamic> json) {
     sortItem = json['sort_item'];
     sortItemWeight = json['sort_item_weight'];
     itemName = json['itemName'];

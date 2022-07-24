@@ -1,31 +1,32 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kaltani_ms/logic/model/sort_item_model.dart';
-import 'package:kaltani_ms/utils/reuseable/ka_button.dart';
-import 'package:kaltani_ms/utils/scaffolds_widget/ka_scaffold.dart';
 
-import '../../logic/controller/sorting_controller.dart';
+import '../../logic/controller/bailing_controller.dart';
 import '../../logic/manager/controller_manager.dart';
-import '../../logic/model/sorting_item_response.dart';
+import '../../logic/model/bailing_item_response.dart';
+import '../../logic/model/sort_item_model.dart';
 import '../../utils/colors.dart';
-import '../../utils/null_checker.dart';
 import '../../utils/reuseable/KAForm.dart';
-import '../../utils/reuseable/card_bg.dart';
 import '../../utils/reuseable/custom_drop_down/ka_dropdown.dart';
 import '../../utils/reuseable/custom_snack_bar.dart';
+import '../../utils/reuseable/ka_button.dart';
 import '../../utils/reuseable/status_screen.dart';
 import '../../utils/scaffolds_widget/ka_appbar.dart';
+import '../../utils/scaffolds_widget/ka_scaffold.dart';
 import '../ui_logic/sorting_page_logic.dart';
 
-class SortingScreen extends ConsumerWidget with SortingView {
-  SortingScreen({Key? key}) : super(key: key);
+class BailingScreen extends ConsumerWidget with BailingView {
+  BailingScreen({Key? key}) : super(key: key);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SortingController controller = ref.watch(sortingManager)
-      ..fetItemList(context)
-      ..setView(this);
+    BailingController controller = ref.watch(bailingManager)
+      ..setView(this)
+      ..fetItemList(context);
     SortingPageLogic sortingPageLogic = ref.watch(sortingPageLogicManager);
+
     return WillPopScope(
         child: KAScaffold(
           scaffoldKey: _scaffoldKey,
@@ -34,7 +35,7 @@ class SortingScreen extends ConsumerWidget with SortingView {
           ),
           appBar: KAppBar(
             backgroundColor: KAColors.appMainLightColor,
-            title: const Text("Sorting"),
+            title: const Text("Bailing"),
           ),
           builder: (_) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +44,7 @@ class SortingScreen extends ConsumerWidget with SortingView {
                 height: 20,
               ),
               Text(
-                "Available Material",
+                "Availalbe Sorted Material",
                 style: Theme.of(context).textTheme.headline1!.copyWith(
                       color: Colors.black,
                     ),
@@ -51,32 +52,39 @@ class SortingScreen extends ConsumerWidget with SortingView {
               const SizedBox(
                 height: 5,
               ),
-              CardBG(
-                color: KAColors.appMainColor,
-                body: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-                  child: Row(
-                    children: [
-                      Text(
-                        "Plastic",
-                        style: Theme.of(context).textTheme.headline1!.copyWith(
-                              color: Colors.white,
-                            ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        isNotEmpty(
-                                controller.sortingItemResponse?.totalCollected)
-                            ? "${controller.sortingItemResponse?.totalCollected} KG"
-                            : "",
-                        style: Theme.of(context).textTheme.headline1!.copyWith(
-                              color: Colors.white,
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+              controller.getAvailableSortedMaterial.isNotEmpty
+                  ? SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.04,
+                      child: ListView.builder(
+                          itemCount:
+                              controller.getAvailableSortedMaterial.length ?? 0,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (_, index) => Container(
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: KAColors.appMainColor,
+                                    boxShadow: const [
+                                      BoxShadow(
+                                          color: Color.fromRGBO(0, 0, 0, 0.15),
+                                          blurRadius: 5)
+                                    ]),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Center(
+                                    child: Text(
+                                      "${controller.getAvailableSortedMaterial[index].key!} - ${controller.getAvailableSortedMaterial[index].value!}kg",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headline4!
+                                          .copyWith(color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              )),
+                    )
+                  : Container(),
+              const SizedBox(
+                height: 20,
               ),
               const SizedBox(
                 height: 20,
@@ -85,8 +93,7 @@ class SortingScreen extends ConsumerWidget with SortingView {
                   child: ListView.builder(
                       itemCount: sortingPageLogic.forItemList.length,
                       itemBuilder: (context, index) {
-                        Widget formUI =
-                            (sortingPageLogic.forItemList[index] as FormUI);
+                        Widget formUI = (sortingPageLogic.forItemList[index]);
 
                         return formUI;
                       })),
@@ -109,8 +116,7 @@ class SortingScreen extends ConsumerWidget with SortingView {
                     onTap: () {
                       sortingPageLogic
                           .removeItem(sortingPageLogic.forItemList.length - 1);
-                      controller
-                          .removeSortedItem(controller.sortiedItem.length - 1);
+                      controller.removeSortedItem(controller.item.length - 1);
                     },
                     bgColor: Colors.red,
                     padding: EdgeInsets.zero,
@@ -124,9 +130,6 @@ class SortingScreen extends ConsumerWidget with SortingView {
               KAButton(
                 onTap: () {
                   controller.submit(context);
-                  // controller.sortiedItem.forEach((element) {
-                  //   log("${element.sortItem} ------> ${element.sortItemWeight}");
-                  // });
                 },
                 padding: EdgeInsets.zero,
                 title: "Submit",
@@ -175,10 +178,10 @@ class FormUI extends StatefulWidget {
 }
 
 class _FormUIState extends State<FormUI> {
-  SortingItems? _itemData;
+  BailingItem? _itemData;
   @override
   Widget build(BuildContext context) {
-    SetItem item = widget.ref!.watch(sortingManager).sortiedItem[widget.index];
+    SetItem item = widget.ref!.watch(bailingManager).item[widget.index];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15),
       child: Row(
@@ -186,7 +189,7 @@ class _FormUIState extends State<FormUI> {
         children: [
           Expanded(
             flex: 5,
-            child: SYDropdownButton<SortingItems>(
+            child: SYDropdownButton<BailingItem>(
                 itemsListTitle: "Select item type",
                 iconSize: 22,
                 value: _itemData,
@@ -198,8 +201,8 @@ class _FormUIState extends State<FormUI> {
                 },
                 onChanged: (v) {
                   bool? exist = widget.ref!
-                      .read(sortingManager)
-                      .haveItemsSelectedSorting(v, context);
+                      .read(bailingManager)
+                      .haveItemsSelectedBailing(v, context);
                   print("${item.sortItem} =========> ${v.id}");
                   if (exist == false || item.sortItem == v.id.toString()) {
                     _itemData = v;
@@ -209,8 +212,8 @@ class _FormUIState extends State<FormUI> {
                   setState(() {});
                 },
                 items: widget.ref!
-                    .watch(sortingManager)
-                    .itemDataList
+                    .watch(bailingManager)
+                    .bailingItem
                     .map(
                       (e) => DropdownMenuItem(
                           value: e,

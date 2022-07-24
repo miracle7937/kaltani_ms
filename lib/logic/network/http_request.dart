@@ -5,6 +5,8 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:kaltani_ms/logic/local_storage.dart';
 import 'package:path/path.dart';
@@ -28,6 +30,7 @@ Future<Map<String, String>> getHeader() async {
 }
 
 const IS_PRODUCTION = kReleaseMode;
+// const IS_PRODUCTION = kDebugMode;
 
 class ServerData {
   dynamic requestBody;
@@ -38,13 +41,12 @@ class ServerData {
     String? userEmail = isEmpty(email) ? "ANONYMOUS" : email;
     String platform = Platform.isIOS ? "iOS" : "Android";
     ServerData().postVerb(APIRoute.logToSlack, body: {
-      'text': "{'response': ${response.body},\n"
-          "'payload': $requestBody\n"
-          "'url': ${response.request?.url.toString()},\n"
+      'text': "'url': ${response.request?.url.toString()},\n"
           "'statusCode': ${response.statusCode},\n"
           "'method': ${response.request?.method}\n"
           "'userEmail': $userEmail\n"
           "'device': $platform\n"
+          "'body': ${response.body},\n"
     });
   }
 
@@ -53,13 +55,19 @@ class ServerData {
       requestBody = body;
     }
     log(jsonEncode(body));
+    log("ROUTE: $route");
     try {
       final response = await http.post(Uri.parse(route),
           headers: await getHeader(), body: jsonEncode(body));
 
       log('POST ${response.statusCode}');
       log(response.body);
-
+      // not authorize need to sign in
+      if (response.statusCode == 401) {
+        await clearUser();
+        Get.toNamed('/');
+        return;
+      }
       return response;
     } on SocketException {
       return http.Response(
@@ -82,14 +90,20 @@ class ServerData {
     }
   }
 
-  static Future<http.Response> getVerb(
+  static Future<dynamic> getVerb(
     String route,
   ) async {
     try {
       final headers = await getHeader();
       final response = await http.get(Uri.parse(route), headers: headers);
+      log('ROUTE $route');
       log('POST ${response.statusCode}');
       log(response.body);
+      if (response.statusCode == 401) {
+        await clearUser();
+        Get.toNamed('/');
+        return;
+      }
       return response;
     } on SocketException {
       return http.Response(
@@ -115,23 +129,24 @@ class ServerData {
   Future<HttpResponse> getData({
     String? path,
   }) async {
-    var header = await getHeader();
-
-    try {
-      var response = await http.get(Uri.parse(path!), headers: header);
-      var data = jsonDecode(response.body);
-      log(">>>>>>>>>>>>>>>>>>>>>>>RESPONSE>>>>>>>>>>>>>>>>>>");
-      log("route: $path \n ${response.body}");
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return HttpData(data);
-      } else {
-        return HttpData(data);
-      }
-    } catch (e) {
-      print('exception get $e');
-      return HttpException('something wrong happened');
-    }
+    var response = await getVerb(path!);
+    var result = await parseResponse(response);
+    return HttpData(result);
+    // try {
+    //   var response = await http.get(Uri.parse(path!), headers: header);
+    //   var data = jsonDecode(response.body);
+    //   log(">>>>>>>>>>>>>>>>>>>>>>>RESPONSE>>>>>>>>>>>>>>>>>>");
+    //   log("route: $path \n ${response.body}");
+    //
+    //   if (response.statusCode == 200 || response.statusCode == 201) {
+    //     return HttpData(data);
+    //   } else {
+    //     return HttpData(data);
+    //   }
+    // } catch (e) {
+    //   print('exception get $e');
+    //   return HttpException('something wrong happened');
+    // }
   }
 
   Future<HttpResponse> postData(

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:kaltani_ms/logic/local_storage.dart';
 import 'package:kaltani_ms/logic/model/auth_response_model.dart';
-import 'package:kaltani_ms/ui_layer/pages/bailin_screen.dart';
+import 'package:kaltani_ms/ui_layer/pages/bailing_screen.dart';
 import 'package:kaltani_ms/ui_layer/pages/sorting_screen.dart';
 import 'package:kaltani_ms/utils/greetings.dart';
 import 'package:kaltani_ms/utils/images.dart';
@@ -33,11 +33,13 @@ class _DashBoardState extends State<DashBoard> {
 
   getUserInfo() async {
     _authResponse = await getUserData();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     String firstName = _authResponse?.user?.firstName ?? "";
+    String location = _authResponse?.user?.locations?.name ?? "";
     return KAScaffold(
       padding: EdgeInsets.zero,
       builder: (_) {
@@ -125,7 +127,7 @@ class _DashBoardState extends State<DashBoard> {
                                   width: 10,
                                 ),
                                 Text(
-                                  "Lekki Phase 1 Center",
+                                  location,
                                   style: Theme.of(context)
                                       .textTheme
                                       .headline6!
@@ -218,7 +220,7 @@ class _DashBoardState extends State<DashBoard> {
 
   final List<DashData> _list = [
     DashData(
-        page: const CollectionScreen(),
+        page: CollectionScreen(),
         title: "Collect",
         image: KAImages.collection,
         color: const Color.fromRGBO(252, 186, 3, 1)),
@@ -229,7 +231,7 @@ class _DashBoardState extends State<DashBoard> {
         color: const Color.fromRGBO(255, 123, 0, 1)),
     DashData(
         title: "Bailing",
-        page: const BailingScreen(),
+        page: BailingScreen(),
         image: KAImages.billing,
         color: const Color.fromRGBO(95, 94, 94, 1)),
     DashData(

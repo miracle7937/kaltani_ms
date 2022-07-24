@@ -1,18 +1,19 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../utils/scaffolds_widget/page_state.dart';
-import '../model/item_response.dart';
 import '../model/sort_item_model.dart';
+import '../model/sorting_item_response.dart';
 import '../network/repository/sorting_repository.dart';
 
 class SortingController extends ChangeNotifier {
-  List<ItemData> itemDataList = [];
+  List<SortingItems> itemDataList = [];
+  SortingItemResponse? sortingItemResponse;
   PageState pageState = PageState.loaded;
   late SortingView _sortingView;
-  List<SortedItem> sortiedItem = [];
-
+  List<SetItem> sortiedItem = [];
+  String? itemID;
   addSortedItem() {
-    sortiedItem.add(SortedItem());
+    sortiedItem.add(SetItem());
   }
 
   removeSortedItem(int i) {
@@ -25,19 +26,24 @@ class SortingController extends ChangeNotifier {
     _sortingView = v;
   }
 
+  setItemID(v) {
+    itemID = v;
+  }
+
   fetItemList(
     BuildContext context,
   ) {
     if (itemDataList.isEmpty) {
       pageState = PageState.loading;
       SortingRepository.getItem().then((value) {
-        pageState = PageState.loaded;
-        notifyListeners();
-        if (value.status = true && value.itemData != null) {
-          itemDataList.addAll(value.itemData!);
+        if (value.status = true && value.sortingItems != null) {
+          itemDataList.addAll(value.sortingItems!);
         } else {
           _sortingView.onError(context, "could not fetch item list");
         }
+        sortingItemResponse = value;
+        pageState = PageState.loaded;
+        notifyListeners();
       }).catchError((v) {
         _sortingView.onError(context, "could not fetch item list");
         pageState = PageState.loading;
@@ -59,22 +65,20 @@ class SortingController extends ChangeNotifier {
         } else {
           itemsWeightList.add(element.sortItemWeight!);
           itemListID.add(element.sortItem!);
-          print("hello");
         }
       }
       data["sort_item_weight"] = itemsWeightList;
       data["sort_item"] = itemListID;
+      data["item_id"] = sortingItemResponse?.items?.first.id.toString();
       postSortingCall(context, data);
     } else {
       _sortingView.onError(context, "Please add items");
     }
-
-    // data["sort_item_weight"] =
-    //     sortiedItem.map((e) => e.sortItemWeight).toList();
-    // data["sort_item"] = sortiedItem.map((e) => e.sortItemWeight).toList();
   }
 
   postSortingCall(BuildContext context, Map data) {
+    pageState = PageState.loading;
+    notifyListeners();
     SortingRepository.sortItem(data).then((value) {
       pageState = PageState.loaded;
       notifyListeners();
@@ -84,13 +88,13 @@ class SortingController extends ChangeNotifier {
         _sortingView.onError(context, value.message!);
       }
     }).catchError((v) {
-      _sortingView.onError(context, "could not fetch item list");
-      pageState = PageState.loading;
+      _sortingView.onServerError(context, v.toString());
+      pageState = PageState.loaded;
       notifyListeners();
     });
   }
 
-  bool? haveItemsSelected(ItemData itemData, BuildContext context) {
+  bool? haveItemsSelectedSorting(SortingItems itemData, BuildContext context) {
     bool exist = sortiedItem
         .map((e) => e.sortItem)
         .toList()
@@ -111,4 +115,5 @@ class SortingController extends ChangeNotifier {
 abstract class SortingView {
   onSuccess(BuildContext context, String message);
   onError(BuildContext context, String message);
+  onServerError(BuildContext context, String message);
 }
