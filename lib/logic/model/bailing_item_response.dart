@@ -31,7 +31,7 @@ class BailingItemResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status;
     data['message'] = message;
     if (items != null) {
@@ -78,7 +78,8 @@ class Items {
 
 class SortedBreakdown {
   int? id;
-  String? blueColour;
+  String? others;
+  String? trash;
   String? greenColour;
   String? cleanClear;
   String? locationId;
@@ -87,7 +88,8 @@ class SortedBreakdown {
 
   SortedBreakdown(
       {id,
-      blueColour,
+      others,
+      trash,
       greenColour,
       cleanClear,
       locationId,
@@ -96,7 +98,8 @@ class SortedBreakdown {
 
   SortedBreakdown.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    blueColour = json['Blue_Colour'];
+    others = json['Others'];
+    trash = json['Trash'];
     greenColour = json['Green_Colour'];
     cleanClear = json['Clean_Clear'];
     locationId = json['location_id'];
@@ -107,7 +110,8 @@ class SortedBreakdown {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['id'] = id;
-    data['Blue_Colour'] = blueColour;
+    data['Others'] = others;
+    data['Trash'] = trash;
     data['Green_Colour'] = greenColour;
     data['Clean_Clear'] = cleanClear;
     data['location_id'] = locationId;
@@ -137,7 +141,7 @@ class BailingItem {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['item'] = item;
     data['items_id'] = itemsId;

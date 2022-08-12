@@ -36,13 +36,13 @@ class User {
   String? phone;
   String? email;
   String? locationId;
-  Null? emailVerifiedAt;
+  String? emailVerifiedAt;
   String? role;
-  Null? factoryId;
-  Null? deviceId;
+  String? factoryId;
+  String? deviceId;
   String? createdAt;
   String? updatedAt;
-  Locations? locations;
+  Location? location;
 
   User(
       {this.id,
@@ -57,7 +57,7 @@ class User {
       this.deviceId,
       this.createdAt,
       this.updatedAt,
-      this.locations});
+      this.location});
 
   User.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -72,9 +72,8 @@ class User {
     deviceId = json['device_id'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
-    locations = json['locations'] != null
-        ? Locations.fromJson(json['locations'])
-        : null;
+    location =
+        json['location'] != null ? Location.fromJson(json['location']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -91,14 +90,14 @@ class User {
     data['device_id'] = deviceId;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
-    if (locations != null) {
-      data['locations'] = locations!.toJson();
+    if (location != null) {
+      data['location'] = location!.toJson();
     }
     return data;
   }
 }
 
-class Locations {
+class Location {
   int? id;
   String? name;
   String? address;
@@ -108,7 +107,7 @@ class Locations {
   String? createdAt;
   String? updatedAt;
 
-  Locations(
+  Location(
       {this.id,
       this.name,
       this.address,
@@ -118,7 +117,7 @@ class Locations {
       this.createdAt,
       this.updatedAt});
 
-  Locations.fromJson(Map<String, dynamic> json) {
+  Location.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     address = json['address'];

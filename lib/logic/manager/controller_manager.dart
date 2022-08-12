@@ -3,6 +3,7 @@ import 'package:kaltani_ms/logic/controller/auth_controller.dart';
 
 import '../../ui_layer/ui_logic/sorting_page_logic.dart';
 import '../controller/bailing_controller.dart';
+import '../controller/change_password_controller.dart';
 import '../controller/collection_controller.dart';
 import '../controller/recyle_controller.dart';
 import '../controller/sales_controller.dart';
@@ -33,4 +34,8 @@ final transferManager = ChangeNotifierProvider<TransferController>((ref) {
 });
 final bailingManager = ChangeNotifierProvider<BailingController>((ref) {
   return BailingController();
+});
+final changePasswordManager =
+    ChangeNotifierProvider<ChangePasswordController>((ref) {
+  return ChangePasswordController();
 });

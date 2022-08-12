@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:kaltani_ms/logic/model/collection_item_response.dart';
+import 'package:kaltani_ms/utils/null_checker.dart';
 
 import '../../utils/scaffolds_widget/page_state.dart';
 import '../local_storage.dart';
@@ -25,6 +26,31 @@ class CollectionController extends ChangeNotifier {
     notifyListeners();
   }
 
+  set setItemWeight(v) {
+    collectionSetData.itemWeight = v;
+    notifyListeners();
+  }
+
+  set setPricePerKG(v) {
+    collectionSetData.pricePerKg = v;
+    notifyListeners();
+  }
+
+  set setTransport(v) {
+    collectionSetData.transport = v;
+    notifyListeners();
+  }
+
+  set setOther(v) {
+    collectionSetData.others = v;
+    notifyListeners();
+  }
+
+  set setLoader(v) {
+    collectionSetData.loader = v;
+    notifyListeners();
+  }
+
   collect(
     BuildContext context,
   ) async {
@@ -32,15 +58,17 @@ class CollectionController extends ChangeNotifier {
     notifyListeners();
     //set userinfo
     AuthResponse userInfo = await getUserData();
-    collectionSetData.location = userInfo.user?.locations?.id.toString();
+    collectionSetData.location = userInfo.user?.location?.id.toString();
     collectionSetData.userId = userInfo.user?.id.toString();
     collectionSetData.item = selectedCollection!.id.toString();
+    collectionSetData.amount = getTotalAmount().toString();
     log(collectionSetData.toJson().toString());
     CollectionRepository.process(collectionSetData).then((value) {
       pageState = PageState.loaded;
       notifyListeners();
       if (value.status == true) {
         _collectionView.onSuccess(context, value.message!);
+        clear();
       } else {
         _collectionView.onError(context, value.message!);
       }
@@ -67,6 +95,20 @@ class CollectionController extends ChangeNotifier {
         _collectionView.onError(context, "");
       });
     }
+  }
+
+  getTotalAmount() {
+    return (isValueEmpty(collectionSetData.itemWeight) *
+            isValueEmpty(collectionSetData.pricePerKg)) +
+        isValueEmpty(collectionSetData.transport) +
+        isValueEmpty(collectionSetData.loader) +
+        isValueEmpty(collectionSetData.others);
+  }
+
+  num isValueEmpty(String? value) => isEmpty(value) ? 0 : num.parse(value!);
+
+  clear() {
+    collectionSetData = CollectionSetData();
   }
 }
 

@@ -26,34 +26,52 @@ class RecycleScreen extends ConsumerWidget with RecycleView {
             backgroundColor: KAColors.appMainLightColor,
             title: const Text("Recycle"),
           ),
-          builder: (_) => Column(
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              KAForm(
-                keyboardType: TextInputType.number,
-                title: "Material Input (KG)",
-                onChange: (v) {
-                  controller.recycleSetModel.itemWeightInput = v;
-                },
-              ),
-              KAForm(
-                keyboardType: TextInputType.number,
-                title: "Material Output(KG)",
-                onChange: (v) {
-                  controller.recycleSetModel.itemWeightOutput = v;
-                },
-              ),
-              const Spacer(),
-              KAButton(
-                loading: controller.pageState == PageState.loading,
-                title: "SUBMIT",
-                onTap: () {
-                  controller.submitSales(context);
-                },
-              )
-            ],
+          builder: (_) => SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                KAForm(
+                  keyboardType: TextInputType.number,
+                  title: "Material Input (KG)",
+                  onChange: (v) {
+                    controller.recycleSetModel.itemWeightInput = v;
+                  },
+                ),
+                KAForm(
+                  keyboardType: TextInputType.number,
+                  title: "Caustic Soda (KG)",
+                  onChange: (v) {
+                    controller.recycleSetModel.causticSoda = v;
+                  },
+                ),
+                KAForm(
+                  keyboardType: TextInputType.number,
+                  title: "Detergent (KG)",
+                  onChange: (v) {
+                    controller.recycleSetModel.detergent = v;
+                  },
+                ),
+                KAForm(
+                  keyboardType: TextInputType.number,
+                  title: "Material Output(KG)",
+                  onChange: (v) {
+                    controller.recycleSetModel.itemWeightOutput = v;
+                  },
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                KAButton(
+                  loading: controller.pageState == PageState.loading,
+                  title: "SUBMIT",
+                  onTap: () {
+                    controller.submitSales(context);
+                  },
+                )
+              ],
+            ),
           ),
         ),
         onWillPop: () {

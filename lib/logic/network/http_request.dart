@@ -54,8 +54,10 @@ class ServerData {
     if (body != null && body != "") {
       requestBody = body;
     }
-    log(jsonEncode(body));
+    log("BODY: ${jsonEncode(body)}");
     log("ROUTE: $route");
+    log("REQUEST: POST");
+
     try {
       final response = await http.post(Uri.parse(route),
           headers: await getHeader(), body: jsonEncode(body));
@@ -72,19 +74,19 @@ class ServerData {
     } on SocketException {
       return http.Response(
           jsonEncode({
-            "title": "No Internet connection",
+            "message": "No Internet connection",
           }),
           500);
     } on HttpException {
       return http.Response(
           jsonEncode({
-            "title": "Network error",
+            "message": "Network error",
           }),
           500);
     } on FormatException {
       return http.Response(
           jsonEncode({
-            "title": "Bad response format",
+            "message": "Bad response format",
           }),
           500);
     }
@@ -98,7 +100,8 @@ class ServerData {
       final response = await http.get(Uri.parse(route), headers: headers);
       log('ROUTE $route');
       log('POST ${response.statusCode}');
-      log(response.body);
+      log("REQUEST: GET");
+      log("BODY: ${response.body}");
       if (response.statusCode == 401) {
         await clearUser();
         Get.toNamed('/');
@@ -108,19 +111,19 @@ class ServerData {
     } on SocketException {
       return http.Response(
           jsonEncode({
-            "title": "No Internet connection",
+            "message": "No Internet connection",
           }),
           500);
     } on HttpException {
       return http.Response(
           jsonEncode({
-            "title": "Network error",
+            "message": "Network error",
           }),
           500);
     } on FormatException {
       return http.Response(
           jsonEncode({
-            "title": "Bad response format",
+            "message": "Bad response format",
           }),
           500);
     }
@@ -292,6 +295,7 @@ class ServerData {
         throw BadFormatException();
       }
     }
+
     if (response.statusCode < 200 || response.statusCode >= 400) {
       switch (response.statusCode) {
         case 503:
@@ -300,7 +304,7 @@ class ServerData {
         default:
           ServerData().logToSlack(response);
           throw BadRequestException(
-            responseBody['title'] ?? "Something went wrong",
+            responseBody['message'] ?? "Something went wrong",
             0,
           );
       }

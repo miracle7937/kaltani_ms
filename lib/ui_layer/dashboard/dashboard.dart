@@ -11,6 +11,7 @@ import 'package:kaltani_ms/utils/scaffolds_widget/ka_scaffold.dart';
 
 import '../../utils/colors.dart';
 import '../../utils/reuseable/card_bg.dart';
+import '../auth/change_password_screen.dart';
 import '../pages/collection_screen.dart';
 import '../pages/recycle_screen.dart';
 import '../pages/sales_screen.dart';
@@ -36,10 +37,23 @@ class _DashBoardState extends State<DashBoard> {
     setState(() {});
   }
 
+  void handleClick(String value) {
+    switch (value) {
+      case 'Change password':
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
+        break;
+      case 'Logout':
+        clearUser();
+        Navigator.pushNamed(context, "/");
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String firstName = _authResponse?.user?.firstName ?? "";
-    String location = _authResponse?.user?.locations?.name ?? "";
+    String location = _authResponse?.user?.location?.name ?? "";
     return KAScaffold(
       padding: EdgeInsets.zero,
       builder: (_) {
@@ -91,6 +105,41 @@ class _DashBoardState extends State<DashBoard> {
                         ],
                       ),
                       const Spacer(),
+                      PopupMenuButton<String>(
+                        icon: SizedBox(
+                          width: MediaQuery.of(context).size.height * 0.07,
+                          height: MediaQuery.of(context).size.height * 0.07,
+                          child: Image.asset(KAImages.logout1),
+                        ),
+                        onSelected: handleClick,
+                        itemBuilder: (BuildContext context) {
+                          return {"Change password", 'Logout'}
+                              .map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: Text(choice,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: KAColors.appBlackColor)),
+                            );
+                          }).toList();
+                        },
+                      ),
+                      // InkWell(
+                      //   onTap: () {
+                      //     clearUser();
+                      //     Navigator.pushNamed(context, "/");
+                      //   },
+                      //   child: SizedBox(
+                      //     width: MediaQuery.of(context).size.height * 0.07,
+                      //     height: MediaQuery.of(context).size.height * 0.07,
+                      //     child: Image.asset(KAImages.logout1),
+                      //   ),
+                      // )
                     ],
                   ),
                   const SizedBox(
@@ -189,11 +238,6 @@ class _DashBoardState extends State<DashBoard> {
   _selectableTab(int i) {
     return CardBG(
       callback: () async {
-        if (_list.length - 1 == i) {
-          clearUser();
-          return;
-        }
-
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => _list[i].page));
       },
@@ -249,10 +293,10 @@ class _DashBoardState extends State<DashBoard> {
         page: SalesScreen(),
         image: KAImages.sells,
         color: const Color.fromRGBO(255, 0, 106, 1)),
-    DashData(
-        title: "Log out",
-        image: KAImages.logout,
-        color: const Color.fromRGBO(210, 0, 38, 1)),
+    // DashData(
+    //     title: "Log out",
+    //     image: KAImages.logout,
+    //     color: const Color.fromRGBO(210, 0, 38, 1)),
   ];
 }
 

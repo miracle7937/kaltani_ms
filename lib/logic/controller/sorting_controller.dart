@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../utils/null_checker.dart';
 import '../../utils/scaffolds_widget/page_state.dart';
-import '../model/sort_item_model.dart';
+import '../../utils/string_helper.dart';
 import '../model/sorting_item_response.dart';
 import '../network/repository/sorting_repository.dart';
 
@@ -9,18 +11,10 @@ class SortingController extends ChangeNotifier {
   List<SortingItems> itemDataList = [];
   SortingItemResponse? sortingItemResponse;
   PageState pageState = PageState.loaded;
+  var materialData = {};
   late SortingView _sortingView;
-  List<SetItem> sortiedItem = [];
   String? itemID;
-  addSortedItem() {
-    sortiedItem.add(SetItem());
-  }
-
-  removeSortedItem(int i) {
-    if (sortiedItem.isNotEmpty) {
-      sortiedItem.removeAt(i);
-    }
-  }
+  num unsortedWeight = 0;
 
   setView(v) {
     _sortingView = v;
@@ -35,48 +29,50 @@ class SortingController extends ChangeNotifier {
   ) {
     if (itemDataList.isEmpty) {
       pageState = PageState.loading;
-      SortingRepository.getItem().then((value) {
-        if (value.status = true && value.sortingItems != null) {
-          itemDataList.addAll(value.sortingItems!);
-        } else {
-          _sortingView.onError(context, "could not fetch item list");
-        }
+      request(context);
+    }
+  }
+
+  refresh(BuildContext context) {
+    pageState = PageState.loading;
+    notifyListeners();
+    request(context);
+  }
+
+  request(BuildContext context) {
+    SortingRepository.getItem().then((value) {
+      if (value.status = true && value.sortingItems != null) {
+        // itemDataList.clear();
+        itemDataList = value.sortingItems!;
         sortingItemResponse = value;
-        pageState = PageState.loaded;
-        notifyListeners();
-      }).catchError((v) {
+      } else {
         _sortingView.onError(context, "could not fetch item list");
-        pageState = PageState.loading;
-        notifyListeners();
-      });
-    }
-  }
-
-  submit(BuildContext context) {
-    var data = {};
-    List<String> itemsWeightList = [];
-    List<String> itemListID = [];
-    if (sortiedItem.isNotEmpty) {
-      for (var element in sortiedItem) {
-        if (element.sortItem != null && element.sortItemWeight == null) {
-          _sortingView.onError(context, "${element.itemName} can not be empty");
-        } else if (element.sortItem == null) {
-          _sortingView.onError(context, "Field(s) can not be empty");
-        } else {
-          itemsWeightList.add(element.sortItemWeight!);
-          itemListID.add(element.sortItem!);
-        }
       }
-      data["sort_item_weight"] = itemsWeightList;
-      data["sort_item"] = itemListID;
-      data["item_id"] = sortingItemResponse?.items?.first.id.toString();
-      postSortingCall(context, data);
+      pageState = PageState.loaded;
+      notifyListeners();
+    }).catchError((v) {
+      _sortingView.onError(context, "could not fetch item list");
+      pageState = PageState.loaded;
+      notifyListeners();
+    });
+  }
+
+  submit(BuildContext context, WidgetRef ref) {
+    if (materialData.isNotEmpty) {
+      if (unsortedWeight < 0) {
+        _sortingView.onError(
+            context, "unsorted material has exceed total material");
+        return;
+      }
+
+      materialData["item_id"] = sortingItemResponse?.items?.first.id.toString();
+      postSortingCall(context, ref, materialData);
     } else {
-      _sortingView.onError(context, "Please add items");
+      _sortingView.onError(context, "Please add item type");
     }
   }
 
-  postSortingCall(BuildContext context, Map data) {
+  postSortingCall(BuildContext context, WidgetRef ref, Map data) {
     pageState = PageState.loading;
     notifyListeners();
     SortingRepository.sortItem(data).then((value) {
@@ -87,18 +83,23 @@ class SortingController extends ChangeNotifier {
       } else {
         _sortingView.onError(context, value.message!);
       }
+      _sortingView.onClearUI(ref);
     }).catchError((v) {
-      _sortingView.onServerError(context, v.toString());
+      _sortingView.onClearUI(ref);
+      _sortingView.onError(context, v.toString());
       pageState = PageState.loaded;
       notifyListeners();
     });
   }
 
   bool? haveItemsSelectedSorting(SortingItems itemData, BuildContext context) {
-    bool exist = sortiedItem
-        .map((e) => e.sortItem)
-        .toList()
-        .contains(itemData.id.toString());
+    bool exist = materialData.containsKey(dbStringReplacer(itemData.item));
+    if (unsortedWeight < 0) {
+      _sortingView.onError(
+          context, "unsorted material has exceed total material");
+      return true;
+    }
+
     if (exist) {
       _sortingView.onError(
           context, "${itemData.item!} has been selected already");
@@ -107,13 +108,31 @@ class SortingController extends ChangeNotifier {
     return false;
   }
 
+  unsorted() {
+    num totalSelectedWeight = 0;
+    for (var key in materialData.keys) {
+      if (isNotEmpty(materialData[key]) && key != "item_id") {
+        totalSelectedWeight =
+            totalSelectedWeight + num.parse(materialData[key]);
+      }
+    }
+    unsortedWeight =
+        num.parse(sortingItemResponse!.totalCollected!) - totalSelectedWeight;
+    notifyListeners();
+  }
+
   void clear() {
-    sortiedItem.clear();
+    materialData.clear();
+    unsortedWeight = 0;
+  }
+
+  displayMessage(BuildContext context, String message) {
+    _sortingView.onError(context, message);
   }
 }
 
 abstract class SortingView {
   onSuccess(BuildContext context, String message);
   onError(BuildContext context, String message);
-  onServerError(BuildContext context, String message);
+  onClearUI(WidgetRef ref);
 }

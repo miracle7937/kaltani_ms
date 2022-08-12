@@ -1,9 +1,9 @@
-import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kaltani_ms/utils/images.dart';
 import 'package:kaltani_ms/utils/reuseable/ka_button.dart';
 import 'package:kaltani_ms/utils/scaffolds_widget/ka_scaffold.dart';
+import 'package:lottie/lottie.dart';
 
 class StatusScreen extends StatelessWidget {
   final String? title;
@@ -18,17 +18,16 @@ class StatusScreen extends StatelessWidget {
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.7,
             height: MediaQuery.of(context).size.height * 0.2,
-            child: FlareActor(
+            child: Lottie.asset(
               KAImages.successAnimation,
-              animation: "Animation",
               alignment: Alignment.center,
               fit: BoxFit.contain,
             ),
           ),
-          const Spacer(),
+          // const Spacer(),
           Text(
             title ?? "Your entries have been successfully submitted",
-            style: Theme.of(context).textTheme.headline4!.copyWith(
+            style: Theme.of(context).textTheme.headline3!.copyWith(
                   color: Colors.black,
                 ),
           ),

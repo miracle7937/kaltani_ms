@@ -17,5 +17,6 @@ class SortingPageLogic extends ChangeNotifier {
 
   void clear() {
     forItemList.clear();
+    notifyListeners();
   }
 }

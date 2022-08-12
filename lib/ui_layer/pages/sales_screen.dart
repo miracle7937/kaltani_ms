@@ -10,6 +10,7 @@ import 'package:kaltani_ms/utils/scaffolds_widget/page_state.dart';
 
 import '../../logic/manager/controller_manager.dart';
 import '../../utils/colors.dart';
+import '../../utils/reuseable/custom_drop_down/ka_dropdown.dart';
 import '../../utils/reuseable/custom_snack_bar.dart';
 import '../../utils/reuseable/status_screen.dart';
 
@@ -28,34 +29,94 @@ class SalesScreen extends ConsumerWidget with SalesView {
             backgroundColor: KAColors.appMainLightColor,
             title: const Text("Sales"),
           ),
-          builder: (_) => Column(
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              KAForm(
-                title: "Material  (KG)",
-                keyboardType: TextInputType.number,
-                onChange: (v) {
-                  controller.saleSetModel.itemWeight = v;
-                },
-              ),
-              KAForm(
-                keyboardType: TextInputType.number,
-                title: "Amount",
-                onChange: (v) {
-                  controller.saleSetModel.amount = v;
-                },
-              ),
-              const Spacer(),
-              KAButton(
-                loading: controller.pageState == PageState.loading,
-                title: "SUBMIT",
-                onTap: () {
-                  controller.submitSales(context);
-                },
-              )
-            ],
+          builder: (_) => SingleChildScrollView(
+            child: Column(
+              children: [
+                KAForm(
+                  title: "Material  (ton)",
+                  keyboardType: TextInputType.number,
+                  onChange: (v) {
+                    controller.setTon = v;
+                  },
+                ),
+                // KAForm(
+                //   keyboardType: TextInputType.number,
+                //   title: "Amount",
+                //   onChange: (v) {
+                //     controller.setAmount = v;
+                //   },
+                // ),
+                SYDropdownButton<String>(
+                    itemsListTitle: "Select Currency",
+                    iconSize: 22,
+                    value: controller.saleSetModel.currency,
+                    hint: const Text(""),
+                    isExpanded: true,
+                    underline: const Divider(),
+                    // value: enrollController.selectedLocationModel,
+                    searchMatcher: (item, text) {
+                      return item.contains(text);
+                    },
+                    onChanged: (v) {
+                      controller.setCurrency = v;
+                    },
+                    items: [
+                      "NGN",
+                      "USD",
+                    ]
+                        .map(
+                          (e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(
+                                e.toString(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline1!
+                                    .copyWith(
+                                      color: Colors.black,
+                                    ),
+                              )),
+                        )
+                        .toList()),
+                const SizedBox(
+                  height: 15,
+                ),
+                KAForm(
+                  keyboardType: TextInputType.number,
+                  title: "Price per ton",
+                  onChange: (v) {
+                    controller.setPricePerTon = v;
+                  },
+                ),
+                KAForm(
+                  keyboardType: TextInputType.number,
+                  title: "Freight",
+                  onChange: (v) {
+                    controller.setFreight = v;
+                  },
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                controller.saleSetModel.currency != null
+                    ? Text(
+                        "${controller.saleSetModel.currency} ${controller.getTotalAmount()}",
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.headline1!.copyWith(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: KAColors.appBlackColor),
+                      )
+                    : Container(),
+                KAButton(
+                  loading: controller.pageState == PageState.loading,
+                  title: "SUBMIT",
+                  onTap: () {
+                    controller.submitSales(context);
+                  },
+                )
+              ],
+            ),
           ),
         ),
         onWillPop: () {

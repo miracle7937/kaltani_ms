@@ -24,74 +24,120 @@ class CollectionScreen extends ConsumerWidget with CollectionView {
     CollectionController controller = ref.watch(collectionManager);
     controller.setView(this);
     controller.collectionList(context);
-    return KAScaffold(
-      state: AppState(pageState: controller.pageState),
-      scaffoldKey: _scaffoldKey,
-      appBar: KAppBar(
-        backgroundColor: KAColors.appMainLightColor,
-        title: const Text("Collection"),
-      ),
-      builder: (_) => SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            SYDropdownButton<CollectionData>(
-                itemsListTitle: "Select item type",
-                iconSize: 22,
-                value: controller.selectedCollection,
-                hint: const Text(""),
-                isExpanded: true,
-                underline: const Divider(),
-                // value: enrollController.selectedLocationModel,
-                searchMatcher: (item, text) {
-                  return item.item!.contains(text);
-                },
-                onChanged: (v) {
-                  controller.setCollection = v;
-                },
-                items: controller.itemList
-                    .map(
-                      (e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(
-                            e.item.toString(),
-                            style:
-                                Theme.of(context).textTheme.headline1!.copyWith(
+    return WillPopScope(
+        child: KAScaffold(
+          state: AppState(pageState: controller.pageState),
+          scaffoldKey: _scaffoldKey,
+          appBar: KAppBar(
+            backgroundColor: KAColors.appMainLightColor,
+            title: const Text("Collection"),
+          ),
+          builder: (_) => SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                SYDropdownButton<CollectionData>(
+                    itemsListTitle: "Select item type",
+                    iconSize: 22,
+                    value: controller.selectedCollection,
+                    hint: const Text(""),
+                    isExpanded: true,
+                    underline: const Divider(),
+                    // value: enrollController.selectedLocationModel,
+                    searchMatcher: (item, text) {
+                      return item.item!.contains(text);
+                    },
+                    onChanged: (v) {
+                      controller.setCollection = v;
+                    },
+                    items: controller.itemList
+                        .map(
+                          (e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(
+                                e.item.toString(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline1!
+                                    .copyWith(
                                       color: Colors.black,
                                     ),
-                          )),
-                    )
-                    .toList()),
-            KAForm(
-              title: "Enter item weight (KG)",
-              onChange: (v) {
-                controller.collectionSetData.itemWeight = v;
-              },
-              keyboardType: TextInputType.number,
+                              )),
+                        )
+                        .toList()),
+                const SizedBox(
+                  height: 10,
+                ),
+                KAForm(
+                  title: "Enter item weight (KG)",
+                  onChange: (v) {
+                    controller.setItemWeight = v;
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+                KAForm(
+                  title: "Price Per KG",
+                  onChange: (v) {
+                    controller.setPricePerKG = v;
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+                KAForm(
+                  title: "Transport",
+                  onChange: (v) {
+                    controller.setTransport = v;
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+                KAForm(
+                  title: "Loader",
+                  onChange: (v) {
+                    controller.setLoader = v;
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+                KAForm(
+                  title: "Others",
+                  onChange: (v) {
+                    controller.setOther = v;
+                  },
+                  keyboardType: TextInputType.number,
+                ),
+                Text(
+                  "TOTAL AMOUNT",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline1!.copyWith(
+                      fontWeight: FontWeight.w400,
+                      color: KAColors.appGreyColor),
+                ),
+                Text(
+                  "NGN ${controller.getTotalAmount()}",
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.headline1!.copyWith(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: KAColors.appBlackColor),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                KAButton(
+                  loading: PageState.loading == controller.pageState,
+                  title: "SUBMIT",
+                  onTap: () {
+                    controller.collect(context);
+                  },
+                ),
+              ],
             ),
-            KAForm(
-              title: "Amount",
-              onChange: (v) {
-                controller.collectionSetData.amount = v;
-              },
-              keyboardType: TextInputType.number,
-            ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * .3,
-            ),
-            KAButton(
-              loading: PageState.loading == controller.pageState,
-              title: "SUBMIT",
-              onTap: () {
-                controller.collect(context);
-              },
-            ),
-          ],
+          ),
         ),
-      ),
-    );
+        onWillPop: () {
+          controller.clear();
+          return Future.value(true);
+        });
   }
 
   @override

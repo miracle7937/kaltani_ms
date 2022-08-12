@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kaltani_ms/logic/model/auth_set_model.dart';
-import 'package:kaltani_ms/logic/network/exceptions.dart';
 
 import '../../utils/scaffolds_widget/page_state.dart';
 import '../local_storage.dart';
+import '../model/change_password_set_model.dart';
 import '../network/repository/auth_repository.dart';
 
 class AuthController extends ChangeNotifier {
   late AuthView _authView;
   AuthSetModel authSetModel = AuthSetModel();
+  ChangePasswordModel changePasswordModel = ChangePasswordModel();
+
   PageState pageState = PageState.loaded;
   setView(v) {
     _authView = v;
@@ -30,6 +32,8 @@ class AuthController extends ChangeNotifier {
         pageState = PageState.loaded;
         notifyListeners();
         if (value.token != null) {
+          //clear instance
+          authSetModel = AuthSetModel();
           //success
           saveUser(value.toJson());
           _authView.onSuccess(context);
@@ -38,7 +42,7 @@ class AuthController extends ChangeNotifier {
         _authView.onError("");
         //error
       }).catchError((onError) {
-        _authView.onError((onError as CustomException).message!);
+        _authView.onError(onError.toString());
 
         pageState = PageState.loaded;
         notifyListeners();

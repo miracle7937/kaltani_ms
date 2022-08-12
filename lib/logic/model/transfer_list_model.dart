@@ -2,7 +2,9 @@ class TransferItemResponse {
   bool? status;
   String? bailed;
   BailedBreakdown? bailedBreakdown;
+  SortedBreakdown? sortedBreakdown;
   List<Factory>? factory;
+  List<CollectionCenter>? collectionCenter;
   List<Items>? items;
   List<TransferItem>? transferItem;
   List<TransferHistory>? transferHistory;
@@ -22,10 +24,19 @@ class TransferItemResponse {
     bailedBreakdown = json['bailed_breakdown'] != null
         ? BailedBreakdown.fromJson(json['bailed_breakdown'])
         : null;
+    sortedBreakdown = json['sorted_breakdown'] != null
+        ? SortedBreakdown.fromJson(json['sorted_breakdown'])
+        : null;
     if (json['factory'] != null) {
       factory = <Factory>[];
       json['factory'].forEach((v) {
         factory!.add(Factory.fromJson(v));
+      });
+    }
+    if (json['collection_center'] != null) {
+      collectionCenter = <CollectionCenter>[];
+      json['collection_center'].forEach((v) {
+        collectionCenter!.add(CollectionCenter.fromJson(v));
       });
     }
     if (json['items'] != null) {
@@ -49,14 +60,21 @@ class TransferItemResponse {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status;
     data['bailed'] = bailed;
     if (bailedBreakdown != null) {
       data['bailed_breakdown'] = bailedBreakdown!.toJson();
     }
+    if (sortedBreakdown != null) {
+      data['sorted_breakdown'] = sortedBreakdown!.toJson();
+    }
     if (factory != null) {
       data['factory'] = factory!.map((v) => v.toJson()).toList();
+    }
+    if (collectionCenter != null) {
+      data['collection_center'] =
+          collectionCenter!.map((v) => v.toJson()).toList();
     }
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
@@ -72,18 +90,69 @@ class TransferItemResponse {
   }
 }
 
-class BailedBreakdown {
+class SortedBreakdown {
   int? id;
-  Null? blueColour;
+  String? others;
+  String? trash;
+  String? caps;
   String? greenColour;
   String? cleanClear;
   String? locationId;
   String? createdAt;
   String? updatedAt;
 
+  SortedBreakdown(
+      {id,
+      others,
+      trash,
+      greenColour,
+      cleanClear,
+      locationId,
+      createdAt,
+      updatedAt});
+
+  SortedBreakdown.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    others = json['Others'];
+    trash = json['Trash'];
+    greenColour = json['Green_Colour'];
+    caps = json['Caps'];
+    cleanClear = json['Clean_Clear'];
+    locationId = json['location_id'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['Others'] = others;
+    data['Trash'] = trash;
+    data['Green_Colour'] = greenColour;
+    data['Clean_Clear'] = cleanClear;
+    data['Caps'] = caps;
+    data['location_id'] = locationId;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+
+class BailedBreakdown {
+  int? id;
+  String? others;
+  String? trash;
+  String? greenColour;
+  String? cleanClear;
+  String? locationId;
+  String? caps;
+  String? createdAt;
+  String? updatedAt;
+
   BailedBreakdown(
       {id,
-      blueColour,
+      others,
+      trash,
       greenColour,
       cleanClear,
       locationId,
@@ -92,20 +161,24 @@ class BailedBreakdown {
 
   BailedBreakdown.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    blueColour = json['Blue_Colour'];
+    others = json['Others'];
+    trash = json['Trash'];
     greenColour = json['Green_Colour'];
     cleanClear = json['Clean_Clear'];
+    caps = json['Caps'];
     locationId = json['location_id'];
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
-    data['Blue_Colour'] = blueColour;
+    data['Others'] = others;
+    data['Trash'] = trash;
     data['Green_Colour'] = greenColour;
     data['Clean_Clear'] = cleanClear;
+    data['Caps'] = caps;
     data['location_id'] = locationId;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
@@ -137,7 +210,45 @@ class Factory {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['name'] = name;
+    data['address'] = address;
+    data['city'] = city;
+    data['state'] = state;
+    data['user_id'] = userId;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+
+class CollectionCenter {
+  int? id;
+  String? name;
+  String? address;
+  String? city;
+  String? state;
+  String? userId;
+  String? createdAt;
+  String? updatedAt;
+
+  CollectionCenter(
+      {id, name, address, city, state, userId, createdAt, updatedAt});
+
+  CollectionCenter.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    address = json['address'];
+    city = json['city'];
+    state = json['state'];
+    userId = json['user_id'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['name'] = name;
     data['address'] = address;
@@ -168,7 +279,7 @@ class Items {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['item'] = item;
     data['user_id'] = userId;
@@ -198,7 +309,7 @@ class TransferItem {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['item'] = item;
     data['items_id'] = itemsId;
@@ -211,25 +322,30 @@ class TransferItem {
 
 class TransferHistory {
   int? id;
+  String? cleanClear;
+  String? greenColour;
+  String? others;
+  String? trash;
   String? collectionId;
   String? factoryId;
-  String? transferItem;
-  String? itemWeight;
   String? locationId;
   String? status;
-  Null? rejReason;
+  String? rejReason;
   String? userId;
   String? createdAt;
   String? updatedAt;
   Factory? factory;
   Factory? location;
+  User? user;
 
   TransferHistory(
       {id,
+      cleanClear,
+      greenColour,
+      others,
+      trash,
       collectionId,
       factoryId,
-      transferItem,
-      itemWeight,
       locationId,
       status,
       rejReason,
@@ -237,14 +353,17 @@ class TransferHistory {
       createdAt,
       updatedAt,
       factory,
-      location});
+      location,
+      user});
 
   TransferHistory.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    cleanClear = json['Clean_Clear'];
+    greenColour = json['Green_Colour'];
+    others = json['Others'];
+    trash = json['Trash'];
     collectionId = json['collection_id'];
     factoryId = json['factory_id'];
-    transferItem = json['transfer_item'];
-    itemWeight = json['item_weight'];
     locationId = json['location_id'];
     status = json['status'];
     rejReason = json['rej_reason'];
@@ -255,15 +374,18 @@ class TransferHistory {
         json['factory'] != null ? Factory.fromJson(json['factory']) : null;
     location =
         json['location'] != null ? Factory.fromJson(json['location']) : null;
+    user = json['user'] != null ? User.fromJson(json['user']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['id'] = id;
+    data['Clean_Clear'] = cleanClear;
+    data['Green_Colour'] = greenColour;
+    data['Others'] = others;
+    data['Trash'] = trash;
     data['collection_id'] = collectionId;
     data['factory_id'] = factoryId;
-    data['transfer_item'] = transferItem;
-    data['item_weight'] = itemWeight;
     data['location_id'] = locationId;
     data['status'] = status;
     data['rej_reason'] = rejReason;
@@ -276,6 +398,67 @@ class TransferHistory {
     if (location != null) {
       data['location'] = location!.toJson();
     }
+    if (user != null) {
+      data['user'] = user!.toJson();
+    }
+    return data;
+  }
+}
+
+class User {
+  int? id;
+  String? firstName;
+  String? lastName;
+  String? phone;
+  String? email;
+  String? locationId;
+  String? roleId;
+  String? factoryId;
+  String? deviceId;
+  String? createdAt;
+  String? updatedAt;
+
+  User(
+      {id,
+      firstName,
+      lastName,
+      phone,
+      email,
+      locationId,
+      emailVerifiedAt,
+      roleId,
+      factoryId,
+      deviceId,
+      createdAt,
+      updatedAt});
+
+  User.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    firstName = json['first_name'];
+    lastName = json['last_name'];
+    phone = json['phone'];
+    email = json['email'];
+    locationId = json['location_id'];
+    roleId = json['role_id'];
+    factoryId = json['factory_id'];
+    deviceId = json['device_id'];
+    createdAt = json['created_at'];
+    updatedAt = json['updated_at'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = id;
+    data['first_name'] = firstName;
+    data['last_name'] = lastName;
+    data['phone'] = phone;
+    data['email'] = email;
+    data['location_id'] = locationId;
+    data['role_id'] = roleId;
+    data['factory_id'] = factoryId;
+    data['device_id'] = deviceId;
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
     return data;
   }
 }
