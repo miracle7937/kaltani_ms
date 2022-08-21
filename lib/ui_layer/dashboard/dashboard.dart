@@ -59,6 +59,7 @@ class _DashBoardState extends State<DashBoard> {
   Widget build(BuildContext context) {
     String firstName = _authResponse?.user?.firstName ?? "";
     String location = _authResponse?.user?.location?.name ?? "";
+    String role = _authResponse?.user?.role?.name ?? "";
     return KAScaffold(
       scaffoldKey: _scaffoldKey,
       padding: EdgeInsets.zero,
@@ -154,10 +155,10 @@ class _DashBoardState extends State<DashBoard> {
                   CardBG(
                     body: SizedBox(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.1,
+                      height: MediaQuery.of(context).size.height * 0.15,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                            horizontal: 12, vertical: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -194,6 +195,41 @@ class _DashBoardState extends State<DashBoard> {
                               ],
                             ),
                             const Spacer(),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "Role",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w400,
+                                      color: KAColors.appGreyColor),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.verified_user_outlined,
+                                  color: Colors.green,
+                                  size: 15,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  role,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: KAColors.appBlackColor),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
