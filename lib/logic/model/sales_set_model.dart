@@ -6,6 +6,7 @@ class SaleSetModel {
   String? currency;
   String? freight;
   String? pricePerTon;
+  String? customerName;
 
   SaleSetModel({this.itemWeight, this.amount});
 
@@ -15,6 +16,7 @@ class SaleSetModel {
     currency = json['currency'];
     freight = json['freight'];
     pricePerTon = json['price_per_tone'];
+    customerName = json['customer_name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -24,6 +26,7 @@ class SaleSetModel {
     data['freight'] = freight;
     data['price_per_tone'] = pricePerTon;
     data['amount'] = amount;
+    data['customer_name'] = customerName;
     return data;
   }
 
@@ -31,5 +34,6 @@ class SaleSetModel {
       isNotEmpty(itemWeight) &&
       isNotEmpty(currency) &&
       isNotEmpty(freight) &&
+      isNotEmpty(customerName) &&
       isNotEmpty(pricePerTon);
 }

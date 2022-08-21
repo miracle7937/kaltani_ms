@@ -62,8 +62,8 @@ class TransferCard extends StatelessWidget {
                                 title: "Factory",
                                 value: transferData?.factory?.name ?? ""),
                             Text(
-                              DateFormat('yMd').format(DateTime.parse(
-                                  transferData!.location!.createdAt!)),
+                              DateFormat('yMd').format(
+                                  DateTime.parse(transferData!.createdAt!)),
                               style: Theme.of(context)
                                   .textTheme
                                   .headline1!

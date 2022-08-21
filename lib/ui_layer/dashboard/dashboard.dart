@@ -9,8 +9,11 @@ import 'package:kaltani_ms/utils/greetings.dart';
 import 'package:kaltani_ms/utils/images.dart';
 import 'package:kaltani_ms/utils/scaffolds_widget/ka_scaffold.dart';
 
+import '../../logic/role_util.dart';
 import '../../utils/colors.dart';
 import '../../utils/reuseable/card_bg.dart';
+import '../../utils/reuseable/custom_snack_bar.dart';
+import '../../utils/role_enum.dart';
 import '../auth/change_password_screen.dart';
 import '../pages/collection_screen.dart';
 import '../pages/recycle_screen.dart';
@@ -25,6 +28,8 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   AuthResponse? _authResponse;
   @override
   void initState() {
@@ -45,7 +50,7 @@ class _DashBoardState extends State<DashBoard> {
         break;
       case 'Logout':
         clearUser();
-        Navigator.pushNamed(context, "/");
+        Navigator.pushReplacementNamed(context, "/");
         break;
     }
   }
@@ -55,6 +60,7 @@ class _DashBoardState extends State<DashBoard> {
     String firstName = _authResponse?.user?.firstName ?? "";
     String location = _authResponse?.user?.location?.name ?? "";
     return KAScaffold(
+      scaffoldKey: _scaffoldKey,
       padding: EdgeInsets.zero,
       builder: (_) {
         return Stack(
@@ -238,8 +244,15 @@ class _DashBoardState extends State<DashBoard> {
   _selectableTab(int i) {
     return CardBG(
       callback: () async {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => _list[i].page));
+        Role.get(_list[i].roleList!).then((canView) async {
+          if (canView) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => _list[i].page));
+          } else {
+            await showSnackBar("Permission not granted", null,
+                key: _scaffoldKey);
+          }
+        });
       },
       color: _list[i].color,
       body: Center(
@@ -264,39 +277,72 @@ class _DashBoardState extends State<DashBoard> {
 
   final List<DashData> _list = [
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.managingDirector,
+          RolesEnum.operationsManager,
+          RolesEnum.admin
+        ],
         page: CollectionScreen(),
         title: "Collect",
         image: KAImages.collection,
         color: const Color.fromRGBO(252, 186, 3, 1)),
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.managingDirector,
+          RolesEnum.operationsManager,
+          RolesEnum.admin
+        ],
         page: SortingScreen(),
         title: "Sorting",
         image: KAImages.sorting,
         color: const Color.fromRGBO(255, 123, 0, 1)),
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.managingDirector,
+          RolesEnum.operationsManager,
+          RolesEnum.admin
+        ],
         title: "Bailing",
         page: BailingScreen(),
         image: KAImages.billing,
         color: const Color.fromRGBO(95, 94, 94, 1)),
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.inventoryOfficer,
+          RolesEnum.managingDirector,
+          RolesEnum.gMLogistics,
+          RolesEnum.admin
+        ],
         page: const TransferScreen(),
         title: "Transfer",
         image: KAImages.transfer,
         color: const Color.fromRGBO(107, 5, 142, 1)),
     DashData(
+        roleList: [
+          RolesEnum.gMofProduction,
+          RolesEnum.managingDirector,
+          RolesEnum.productionManager,
+          RolesEnum.admin
+        ],
         title: "Recycle",
         page: RecycleScreen(),
         image: KAImages.recycle,
         color: const Color.fromRGBO(0, 206, 120, 1)),
     DashData(
+        roleList: [
+          RolesEnum.salesManager,
+          RolesEnum.managingDirector,
+          RolesEnum.salesOfficer,
+          RolesEnum.admin
+        ],
         title: "Sales",
         page: SalesScreen(),
         image: KAImages.sells,
         color: const Color.fromRGBO(255, 0, 106, 1)),
-    // DashData(
-    //     title: "Log out",
-    //     image: KAImages.logout,
-    //     color: const Color.fromRGBO(210, 0, 38, 1)),
   ];
 }
 
@@ -304,5 +350,12 @@ class DashData {
   late final String? title, image;
   late final dynamic page;
   late final Color? color;
-  DashData({this.title, this.image, this.page, this.color});
+  final List<RolesEnum>? roleList;
+  DashData({
+    this.title,
+    this.image,
+    this.page,
+    this.color,
+    this.roleList,
+  });
 }

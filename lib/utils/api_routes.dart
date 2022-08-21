@@ -1,5 +1,5 @@
 class APIRoute {
-  static String base = "http://kaltaniims.com/api";
+  static String base = "https://kaltanimis.com/api";
   static String login = "$base/login";
   static String updatePassword = "$base/updatepassword";
   static String collection = "$base/collection";
@@ -7,6 +7,9 @@ class APIRoute {
   static String itemList = "$base/itemList";
   static String updateTransfer = "$base/updateTransfer";
   static String sales = "$base/sales";
+  static String saleBailed = "$base/saleBailed";
+  static String getLocation = "$base/getLocation";
+  static String getBreakDown = "$base/getsalesbrakedown";
   static String sorting = "$base/sorting";
   static String getSorting = "$base/getSorting";
   static String getBailing = "$base/getBailing";

@@ -31,7 +31,7 @@ class AuthController extends ChangeNotifier {
       AuthRepository.login(authSetModel).then((value) {
         pageState = PageState.loaded;
         notifyListeners();
-        if (value.token != null) {
+        if (value.status == true) {
           //clear instance
           authSetModel = AuthSetModel();
           //success
@@ -39,10 +39,10 @@ class AuthController extends ChangeNotifier {
           _authView.onSuccess(context);
           return;
         }
-        _authView.onError("");
+        _authView.onError(value.message!);
         //error
-      }).catchError((onError) {
-        _authView.onError(onError.toString());
+      }).catchError((error) {
+        _authView.onError(error.toString());
 
         pageState = PageState.loaded;
         notifyListeners();

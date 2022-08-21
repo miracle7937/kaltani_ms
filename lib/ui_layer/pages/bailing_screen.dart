@@ -31,8 +31,11 @@ class BailingScreen extends ConsumerWidget with BailingView {
         child: KAScaffold(
           scaffoldKey: _scaffoldKey,
           state: AppState(
-            pageState: controller.pageState,
-          ),
+              pageState: controller.pageState,
+              noDataMessage: controller.errorMessage,
+              onRetry: () {
+                controller.refresh(context);
+              }),
           appBar: KAppBar(
             backgroundColor: KAColors.appMainLightColor,
             title: const Text("Bailing"),
@@ -59,6 +62,7 @@ class BailingScreen extends ConsumerWidget with BailingView {
                           ? SizedBox(
                               height: MediaQuery.of(context).size.height * 0.04,
                               child: ListView.builder(
+                                  shrinkWrap: false,
                                   itemCount: controller
                                       .getAvailableSortedMaterial.length,
                                   scrollDirection: Axis.horizontal,
@@ -92,9 +96,6 @@ class BailingScreen extends ConsumerWidget with BailingView {
                                       )),
                             )
                           : Container(),
-                      const SizedBox(
-                        height: 20,
-                      ),
                       const SizedBox(
                         height: 20,
                       ),

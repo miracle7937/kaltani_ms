@@ -13,7 +13,8 @@ class BailingController extends ChangeNotifier {
   late BailingView _bailingView;
   var materialData = {};
   BailingItemResponse? bailingItemResponse;
-
+  int count = 0;
+  String errorMessage = "";
   setView(v) {
     _bailingView = v;
   }
@@ -21,9 +22,10 @@ class BailingController extends ChangeNotifier {
   fetItemList(
     BuildContext context,
   ) {
-    if (bailingItem.isEmpty) {
+    if (bailingItem.isEmpty && count < 1) {
       pageState = PageState.loading;
       request(context);
+      count++;
     }
   }
 
@@ -33,14 +35,17 @@ class BailingController extends ChangeNotifier {
         bailingItem.clear();
         bailingItem.addAll(value.bailingItem!);
         bailingItemResponse = value;
+        pageState = PageState.loaded;
       } else {
-        _bailingView.onError(context, "could not fetch item list");
+        errorMessage = value.message ?? "Could not fetch item list";
+        _bailingView.onError(context, errorMessage);
+        pageState = PageState.error;
       }
-      pageState = PageState.loaded;
       notifyListeners();
     }).catchError((v) {
-      _bailingView.onError(context, "could not fetch item list");
-      pageState = PageState.loaded;
+      errorMessage = v.toString();
+      _bailingView.onError(context, errorMessage);
+      pageState = PageState.error;
       notifyListeners();
     });
   }
@@ -97,10 +102,10 @@ class BailingController extends ChangeNotifier {
     List<KeyValueModel> listOfKeyValue = [];
     Map breakDownMap = bailingItemResponse!.sortedBreakdown!.toJson();
     bailingItemResponse!.bailingItem?.forEach((key) {
-      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_"))) {
-        listOfKeyValue.add(KeyValueModel(
-            key: key.item,
-            value: breakDownMap[key.item?.replaceAll(" ", "_")]));
+      var amountValue = breakDownMap[key.item?.replaceAll(" ", "_")];
+      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_")) &&
+          amountValue != "0") {
+        listOfKeyValue.add(KeyValueModel(key: key.item, value: amountValue));
       }
     });
     return listOfKeyValue;

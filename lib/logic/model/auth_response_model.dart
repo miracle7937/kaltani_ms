@@ -4,9 +4,15 @@ class AuthResponse {
   User? user;
   String? token;
   bool? expiresIn;
+  String? role;
 
   AuthResponse(
-      {this.status, this.message, this.user, this.token, this.expiresIn});
+      {this.status,
+      this.message,
+      this.user,
+      this.token,
+      this.expiresIn,
+      this.role});
 
   AuthResponse.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -14,6 +20,7 @@ class AuthResponse {
     user = json['user'] != null ? User.fromJson(json['user']) : null;
     token = json['token'];
     expiresIn = json['expiresIn'];
+    role = json['role'];
   }
 
   Map<String, dynamic> toJson() {
@@ -25,6 +32,7 @@ class AuthResponse {
     }
     data['token'] = token;
     data['expiresIn'] = expiresIn;
+
     return data;
   }
 }
@@ -37,11 +45,9 @@ class User {
   String? email;
   String? locationId;
   String? emailVerifiedAt;
-  String? role;
+  UserRole? role;
   String? factoryId;
   String? deviceId;
-  String? createdAt;
-  String? updatedAt;
   Location? location;
 
   User(
@@ -55,8 +61,6 @@ class User {
       this.role,
       this.factoryId,
       this.deviceId,
-      this.createdAt,
-      this.updatedAt,
       this.location});
 
   User.fromJson(Map<String, dynamic> json) {
@@ -67,11 +71,10 @@ class User {
     email = json['email'];
     locationId = json['location_id'];
     emailVerifiedAt = json['email_verified_at'];
-    role = json['role'];
+    role = json['role'] != null ? UserRole.fromJson(json['role']) : null;
     factoryId = json['factory_id'];
     deviceId = json['device_id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+
     location =
         json['location'] != null ? Location.fromJson(json['location']) : null;
   }
@@ -88,8 +91,6 @@ class User {
     data['role'] = role;
     data['factory_id'] = factoryId;
     data['device_id'] = deviceId;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
     if (location != null) {
       data['location'] = location!.toJson();
     }
@@ -104,18 +105,9 @@ class Location {
   String? city;
   String? state;
   String? userId;
-  String? createdAt;
-  String? updatedAt;
 
   Location(
-      {this.id,
-      this.name,
-      this.address,
-      this.city,
-      this.state,
-      this.userId,
-      this.createdAt,
-      this.updatedAt});
+      {this.id, this.name, this.address, this.city, this.state, this.userId});
 
   Location.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -124,8 +116,6 @@ class Location {
     city = json['city'];
     state = json['state'];
     userId = json['user_id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
@@ -136,8 +126,22 @@ class Location {
     data['city'] = city;
     data['state'] = state;
     data['user_id'] = userId;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+    return data;
+  }
+}
+
+class UserRole {
+  String? name;
+
+  UserRole({this.name});
+
+  UserRole.fromJson(Map<String, dynamic> json) {
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
     return data;
   }
 }

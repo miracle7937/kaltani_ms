@@ -294,8 +294,6 @@ class TransferItem {
   String? item;
   String? itemsId;
   String? userId;
-  String? createdAt;
-  String? updatedAt;
 
   TransferItem({id, item, itemsId, userId, createdAt, updatedAt});
 
@@ -304,8 +302,6 @@ class TransferItem {
     item = json['item'];
     itemsId = json['items_id'];
     userId = json['user_id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
   }
 
   Map<String, dynamic> toJson() {
@@ -314,8 +310,7 @@ class TransferItem {
     data['item'] = item;
     data['items_id'] = itemsId;
     data['user_id'] = userId;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+
     return data;
   }
 }
@@ -326,17 +321,17 @@ class TransferHistory {
   String? greenColour;
   String? others;
   String? trash;
+  String? caps;
   String? collectionId;
   String? factoryId;
   String? locationId;
   String? status;
   String? rejReason;
   String? userId;
-  String? createdAt;
-  String? updatedAt;
   Factory? factory;
   Factory? location;
   User? user;
+  String? createdAt;
 
   TransferHistory(
       {id,
@@ -344,17 +339,17 @@ class TransferHistory {
       greenColour,
       others,
       trash,
+      caps,
       collectionId,
       factoryId,
       locationId,
       status,
       rejReason,
       userId,
-      createdAt,
-      updatedAt,
       factory,
       location,
-      user});
+      user,
+      createdAt});
 
   TransferHistory.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -362,14 +357,15 @@ class TransferHistory {
     greenColour = json['Green_Colour'];
     others = json['Others'];
     trash = json['Trash'];
+    caps = json['Caps'];
     collectionId = json['collection_id'];
     factoryId = json['factory_id'];
     locationId = json['location_id'];
     status = json['status'];
     rejReason = json['rej_reason'];
     userId = json['user_id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    createdAt = json["created_at"];
+
     factory =
         json['factory'] != null ? Factory.fromJson(json['factory']) : null;
     location =
@@ -378,12 +374,13 @@ class TransferHistory {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['Clean_Clear'] = cleanClear;
     data['Green_Colour'] = greenColour;
     data['Others'] = others;
     data['Trash'] = trash;
+    data['Caps'] = caps;
     data['collection_id'] = collectionId;
     data['factory_id'] = factoryId;
     data['location_id'] = locationId;
@@ -391,7 +388,7 @@ class TransferHistory {
     data['rej_reason'] = rejReason;
     data['user_id'] = userId;
     data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+
     if (factory != null) {
       data['factory'] = factory!.toJson();
     }

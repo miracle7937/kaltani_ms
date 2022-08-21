@@ -15,7 +15,8 @@ class SortingController extends ChangeNotifier {
   late SortingView _sortingView;
   String? itemID;
   num unsortedWeight = 0;
-
+  int count = 0;
+  String errorMessage = "";
   setView(v) {
     _sortingView = v;
   }
@@ -27,9 +28,10 @@ class SortingController extends ChangeNotifier {
   fetItemList(
     BuildContext context,
   ) {
-    if (itemDataList.isEmpty) {
+    if (itemDataList.isEmpty && count < 1) {
       pageState = PageState.loading;
       request(context);
+      count++;
     }
   }
 
@@ -45,14 +47,18 @@ class SortingController extends ChangeNotifier {
         // itemDataList.clear();
         itemDataList = value.sortingItems!;
         sortingItemResponse = value;
+        pageState = PageState.loaded;
       } else {
-        _sortingView.onError(context, "could not fetch item list");
+        errorMessage = value.message ?? "Could not fetch item list";
+        _sortingView.onError(context, errorMessage);
+        pageState = PageState.error;
       }
-      pageState = PageState.loaded;
+
       notifyListeners();
     }).catchError((v) {
-      _sortingView.onError(context, "could not fetch item list");
-      pageState = PageState.loaded;
+      errorMessage = v.toString();
+      _sortingView.onError(context, errorMessage);
+      pageState = PageState.error;
       notifyListeners();
     });
   }

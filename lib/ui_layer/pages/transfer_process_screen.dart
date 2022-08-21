@@ -9,6 +9,7 @@ import '../../utils/colors.dart';
 import '../../utils/reuseable/KAForm.dart';
 import '../../utils/reuseable/custom_drop_down/ka_dropdown.dart';
 import '../../utils/reuseable/custom_snack_bar.dart';
+import '../../utils/reuseable/error_switcher.dart';
 import '../../utils/reuseable/ka_button.dart';
 import '../../utils/reuseable/status_screen.dart';
 import '../../utils/scaffolds_widget/ka_appbar.dart';
@@ -25,162 +26,178 @@ class TransferProcessScreen extends ConsumerWidget with OnProcessTransfer {
     SortingPageLogic sortingPageLogic = ref.watch(sortingPageLogicManager);
     TransferController controller = ref.watch(transferManager)
       ..onProcessView = this;
+
     return WillPopScope(
         child: KAScaffold(
-          scaffoldKey: _scaffoldKey,
-          state: AppState(
-            pageState: controller.pageState,
-          ),
-          appBar: KAppBar(
-            backgroundColor: KAColors.appMainLightColor,
-            title: const Text("Transfer"),
-          ),
-          builder: (_) => RefreshIndicator(
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            scaffoldKey: _scaffoldKey,
+            state: AppState(
+              pageState: controller.pageState,
+            ),
+            appBar: KAppBar(
+              backgroundColor: KAColors.appMainLightColor,
+              title: const Text("Transfer"),
+            ),
+            builder: (_) {
+              if (controller.transferItemResponse?.bailedBreakdown == null) {
+                return ErrorSwitcher(
+                  message: "No Bailed to Transfer from",
+                  onRetry: () {
+                    controller.refresh(context);
+                  },
+                );
+              }
+              return RefreshIndicator(
+                  child: Stack(
                     children: [
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Text(
-                        "Available Bailed Material",
-                        style: Theme.of(context).textTheme.headline1!.copyWith(
-                              color: Colors.black,
-                            ),
-                      ),
-                      const SizedBox(
-                        height: 5,
-                      ),
-                      controller.getAvailableBailingMaterial.isNotEmpty
-                          ? SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.04,
-                              child: ListView.builder(
-                                  itemCount: controller
-                                      .getAvailableBailingMaterial.length,
-                                  scrollDirection: Axis.horizontal,
-                                  itemBuilder: (_, index) => Padding(
-                                        padding: const EdgeInsets.all(2),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              color: KAColors.appMainColor,
-                                              boxShadow: const [
-                                                BoxShadow(
-                                                    color: Color.fromRGBO(
-                                                        0, 0, 0, 0.15),
-                                                    blurRadius: 5)
-                                              ]),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8),
-                                            child: Center(
-                                              child: Text(
-                                                "${controller.getAvailableBailingMaterial[index].key} - ${controller.getAvailableBailingMaterial[index].value}kg",
-                                                style: Theme.of(context)
-                                                    .textTheme
-                                                    .headline4!
-                                                    .copyWith(
-                                                        color: Colors.white),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            "Available Bailed Material",
+                            style:
+                                Theme.of(context).textTheme.headline1!.copyWith(
+                                      color: Colors.black,
+                                    ),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          controller.getAvailableBailingMaterial.isNotEmpty
+                              ? SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.04,
+                                  child: ListView.builder(
+                                      itemCount: controller
+                                          .getAvailableBailingMaterial.length,
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (_, index) => Padding(
+                                            padding: const EdgeInsets.all(2),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                  color: KAColors.appMainColor,
+                                                  boxShadow: const [
+                                                    BoxShadow(
+                                                        color: Color.fromRGBO(
+                                                            0, 0, 0, 0.15),
+                                                        blurRadius: 5)
+                                                  ]),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                child: Center(
+                                                  child: Text(
+                                                    "${controller.getAvailableBailingMaterial[index].key} - ${controller.getAvailableBailingMaterial[index].value}kg",
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline4!
+                                                        .copyWith(
+                                                            color:
+                                                                Colors.white),
+                                                  ),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ),
-                                      )),
-                            )
-                          : Container(),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SYDropdownButton<Factory>(
-                          itemsListTitle: "Select Factory",
-                          iconSize: 22,
-                          value: controller.factory,
-                          hint: const Text(""),
-                          isExpanded: true,
-                          underline: const Divider(),
-                          searchMatcher: (item, text) {
-                            return item.name!
-                                .toLowerCase()
-                                .contains(text.toLowerCase());
-                          },
-                          onChanged: (v) {
-                            controller.setFactory = v;
-                          },
-                          items: controller.transferItemResponse?.factory
-                              ?.map(
-                                (e) => DropdownMenuItem(
-                                    value: e,
-                                    child: Text(
-                                      e.name!,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headline1!
-                                          .copyWith(
-                                            color: Colors.black,
-                                          ),
-                                    )),
-                              )
-                              .toList()),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      Expanded(
-                          child: ListView.builder(
-                              itemCount: sortingPageLogic.forItemList.length,
-                              itemBuilder: (context, index) {
-                                Widget formUI =
-                                    (sortingPageLogic.forItemList[index]);
-
-                                return formUI;
-                              })),
-                      Row(
-                        children: [
-                          KAButton(
-                            onTap: () {
-                              sortingPageLogic.addItem(FormUI(
-                                ref: ref,
-                                index: sortingPageLogic.forItemList.length,
-                              ));
-                            },
-                            bgColor: Colors.green,
-                            padding: EdgeInsets.zero,
-                            child: const Icon(Icons.add),
+                                          )),
+                                )
+                              : Container(),
+                          const SizedBox(
+                            height: 15,
                           ),
-                          const Spacer(),
+                          SYDropdownButton<Factory>(
+                              itemsListTitle: "Select Location",
+                              iconSize: 22,
+                              value: controller.factory,
+                              hint: const Text(""),
+                              isExpanded: true,
+                              underline: const Divider(),
+                              searchMatcher: (item, text) {
+                                return item.name!
+                                    .toLowerCase()
+                                    .contains(text.toLowerCase());
+                              },
+                              onChanged: (v) {
+                                controller.setFactory = v;
+                              },
+                              items: controller.transferItemResponse?.factory
+                                  ?.map(
+                                    (e) => DropdownMenuItem(
+                                        value: e,
+                                        child: Text(
+                                          e.name!,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headline1!
+                                              .copyWith(
+                                                color: Colors.black,
+                                              ),
+                                        )),
+                                  )
+                                  .toList()),
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          Expanded(
+                              child: ListView.builder(
+                                  itemCount:
+                                      sortingPageLogic.forItemList.length,
+                                  itemBuilder: (context, index) {
+                                    Widget formUI =
+                                        (sortingPageLogic.forItemList[index]);
+
+                                    return formUI;
+                                  })),
+                          Row(
+                            children: [
+                              KAButton(
+                                onTap: () {
+                                  sortingPageLogic.addItem(FormUI(
+                                    ref: ref,
+                                    index: sortingPageLogic.forItemList.length,
+                                  ));
+                                },
+                                bgColor: Colors.green,
+                                padding: EdgeInsets.zero,
+                                child: const Icon(Icons.add),
+                              ),
+                              const Spacer(),
+                              KAButton(
+                                onTap: () {
+                                  sortingPageLogic.removeItem(
+                                      sortingPageLogic.forItemList.length - 1);
+                                },
+                                bgColor: Colors.red,
+                                padding: EdgeInsets.zero,
+                                child: const Icon(Icons.cancel),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
                           KAButton(
                             onTap: () {
-                              sortingPageLogic.removeItem(
-                                  sortingPageLogic.forItemList.length - 1);
+                              controller.summitBailed(context, ref);
+                              // controller.submit(context, ref);
                             },
-                            bgColor: Colors.red,
                             padding: EdgeInsets.zero,
-                            child: const Icon(Icons.cancel),
-                          )
+                            title: "Submit",
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
                         ],
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      KAButton(
-                        onTap: () {
-                          controller.submit(context, ref);
-                        },
-                        padding: EdgeInsets.zero,
-                        title: "Submit",
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
+                      )
                     ],
-                  )
-                ],
-              ),
-              onRefresh: () async {
-                controller.refresh(context);
-              }),
-        ),
+                  ),
+                  onRefresh: () async {
+                    controller.refresh(context);
+                  });
+            }),
         onWillPop: () async {
           sortingPageLogic.clear();
           controller.clear();
@@ -221,6 +238,7 @@ class FormUI extends StatefulWidget {
 
 class _FormUIState extends State<FormUI> {
   TransferItem? _itemData;
+
   var addValue = {};
   final textController = TextEditingController();
 
@@ -250,9 +268,11 @@ class _FormUIState extends State<FormUI> {
                       .haveItemsSelectedTransferItem(v, context);
                   if (exist == false) {
                     _itemData = v;
-                    addValue[dbStringReplacer(_itemData?.item)] = "0";
                     //setting it the controller
-                    controller.materialData.addAll(addValue);
+
+                    controller.bailMaterialData[
+                        dbStringReplacer(_itemData?.item)] = {};
+
                     setState(() {});
                   }
                 },
@@ -277,14 +297,35 @@ class _FormUIState extends State<FormUI> {
             width: 20,
           ),
           Expanded(
+              flex: 2,
+              child: KAForm(
+                keyboardType: TextInputType.number,
+                padding: EdgeInsets.zero,
+                title: "Total Weight",
+                onChange: (v) {
+                  if (_itemData != null) {
+                    controller.addMaterial(
+                        dbStringReplacer(_itemData?.item), {"total_weight": v});
+                    // controller.materialData.addAll(addValue);
+                  } else {
+                    textController.clear();
+                    controller.displayMessage(
+                        context, "Select item type before inputting value");
+                  }
+                },
+              )),
+          const SizedBox(
+            width: 20,
+          ),
+          Expanded(
               child: KAForm(
             keyboardType: TextInputType.number,
             padding: EdgeInsets.zero,
-            title: "",
+            title: "QTY",
             onChange: (v) {
               if (_itemData != null) {
-                addValue[dbStringReplacer(_itemData?.item)] = v;
-                controller.materialData.addAll(addValue);
+                controller.addMaterial(
+                    dbStringReplacer(_itemData?.item), {"quantity": v});
               } else {
                 textController.clear();
                 controller.displayMessage(

@@ -57,9 +57,9 @@ class CollectionController extends ChangeNotifier {
     pageState = PageState.loading;
     notifyListeners();
     //set userinfo
-    AuthResponse userInfo = await getUserData();
-    collectionSetData.location = userInfo.user?.location?.id.toString();
-    collectionSetData.userId = userInfo.user?.id.toString();
+    AuthResponse? userInfo = await getUserData();
+    collectionSetData.location = userInfo?.user?.location?.id.toString();
+    collectionSetData.userId = userInfo?.user?.id.toString();
     collectionSetData.item = selectedCollection!.id.toString();
     collectionSetData.amount = getTotalAmount().toString();
     log(collectionSetData.toJson().toString());
@@ -97,7 +97,7 @@ class CollectionController extends ChangeNotifier {
     }
   }
 
-  getTotalAmount() {
+  num getTotalAmount() {
     return (isValueEmpty(collectionSetData.itemWeight) *
             isValueEmpty(collectionSetData.pricePerKg)) +
         isValueEmpty(collectionSetData.transport) +

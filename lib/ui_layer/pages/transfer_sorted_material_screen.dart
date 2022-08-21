@@ -94,7 +94,7 @@ class TransferSortedScreen extends ConsumerWidget with OnProcessTransfer {
                         height: 15,
                       ),
                       SYDropdownButton<CollectionCenter>(
-                          itemsListTitle: "Select Collection Center",
+                          itemsListTitle: "Select Location",
                           iconSize: 22,
                           value: controller.collectionCenter,
                           hint: const Text(""),

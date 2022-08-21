@@ -28,7 +28,12 @@ class TransferScreen extends ConsumerWidget with TransferView {
         backgroundColor: KAColors.appMainLightColor,
         title: const Text("Transfers"),
       ),
-      state: AppState(pageState: controller.pageState),
+      state: AppState(
+          pageState: controller.pageState,
+          noDataMessage: controller.errorMassage,
+          onRetry: () {
+            controller.refresh(context);
+          }),
       builder: (_) => WillPopScope(
           child: RefreshIndicator(
               color: KAColors.appMainColor,
@@ -122,7 +127,8 @@ class TransferScreen extends ConsumerWidget with TransferView {
                               const SizedBox(
                                 height: 15,
                               ),
-                              ...controller.listItem.map((e) => TransferCard(
+                              ...controller.listItem.reversed.map((e) =>
+                                  TransferCard(
                                     transferData: e,
                                     callback: () {
                                       Navigator.push(

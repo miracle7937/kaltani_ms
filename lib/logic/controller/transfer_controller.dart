@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:kaltani_ms/utils/null_checker.dart';
 import 'package:kaltani_ms/utils/scaffolds_widget/page_state.dart';
 
+import '../../utils/null_checker.dart';
 import '../../utils/string_helper.dart';
 import '../model/key_value_model.dart';
 import '../model/transfer_list_model.dart';
@@ -17,7 +17,9 @@ class TransferController extends ChangeNotifier {
   late OnTransferStatusView _statusView;
   late OnProcessTransfer _onProcessTransferView;
   bool fetch = false;
-  var materialData = {};
+  Map<String, dynamic> bailMaterialData = {};
+  String errorMassage = "";
+  Map materialData = {};
   Factory? factory;
   CollectionCenter? collectionCenter;
   PageState pageState = PageState.loaded;
@@ -79,22 +81,38 @@ class TransferController extends ChangeNotifier {
       fetch = true;
       notifyListeners();
     }).catchError((v) {
-      _view.onError(context, "could not fetch item list");
-      pageState = PageState.loaded;
+      errorMassage = v.toString();
+      _view.onError(context, errorMassage);
+      pageState = PageState.error;
       fetch = true;
       notifyListeners();
     });
+  }
+
+  summitBailed(BuildContext context, WidgetRef ref) {
+    if (factory == null) {
+      _onProcessTransferView.onError(context, "Please select location");
+      return;
+    }
+    if (bailMaterialData.isNotEmpty) {
+      var map = {};
+      map.addAll(bailMaterialData);
+      map.addAll({"item_id": transferItemResponse?.items?.first.id.toString()});
+      map.addAll({"factory_id": factory?.id.toString()});
+      print(map);
+
+      // return;
+      postSortingCall(context, ref, map, forBailedTransfer: true);
+    } else {
+      _onProcessTransferView.onError(context, "Please add items");
+    }
   }
 
   submit(BuildContext context, WidgetRef ref, {bool forBailedTransfer = true}) {
     if (materialData.isNotEmpty) {
       materialData["item_id"] =
           transferItemResponse?.items?.first.id.toString();
-      if (forBailedTransfer) {
-        materialData["factory_id"] = factory?.id.toString();
-      } else {
-        materialData["toLocation"] = collectionCenter?.id.toString();
-      }
+      materialData["toLocation"] = collectionCenter?.id.toString();
 
       postSortingCall(context, ref, materialData,
           forBailedTransfer: forBailedTransfer);
@@ -103,7 +121,7 @@ class TransferController extends ChangeNotifier {
     }
   }
 
-  postSortingCall(BuildContext context, WidgetRef ref, Map data,
+  postSortingCall(BuildContext context, WidgetRef ref, dynamic data,
       {bool forBailedTransfer = true}) {
     pageState = PageState.loading;
     notifyListeners();
@@ -181,9 +199,12 @@ class TransferController extends ChangeNotifier {
 
   List<KeyValueModel> get getAvailableBailingMaterial {
     List<KeyValueModel> listOfKeyValue = [];
+
     Map breakDownMap = transferItemResponse!.bailedBreakdown!.toJson();
     transferItemResponse!.transferItem?.forEach((key) {
-      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_"))) {
+      var amount = breakDownMap[key.item?.replaceAll(" ", "_")];
+      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_")) &&
+          amount != "0") {
         listOfKeyValue.add(KeyValueModel(
             key: key.item,
             value: breakDownMap[key.item?.replaceAll(" ", "_")]));
@@ -196,7 +217,9 @@ class TransferController extends ChangeNotifier {
     List<KeyValueModel> listOfKeyValue = [];
     Map breakDownMap = transferItemResponse!.sortedBreakdown!.toJson();
     transferItemResponse!.transferItem?.forEach((key) {
-      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_"))) {
+      var amount = breakDownMap[key.item?.replaceAll(" ", "_")];
+      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_")) &&
+          amount != "0") {
         listOfKeyValue.add(KeyValueModel(
             key: key.item,
             value: breakDownMap[key.item?.replaceAll(" ", "_")]));
@@ -216,7 +239,12 @@ class TransferController extends ChangeNotifier {
 
   clear() {
     materialData.clear();
+    bailMaterialData.clear();
     factory = null;
+  }
+
+  addMaterial(String materialType, Map data) {
+    bailMaterialData[materialType]?.addAll(data);
   }
 }
 

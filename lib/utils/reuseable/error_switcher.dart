@@ -22,7 +22,7 @@ class ErrorSwitcher extends StatelessWidget {
     return _ErrorWidget(
       message: message!,
       onRetry: onRetry!,
-      subMessage: subMessage!,
+      subMessage: subMessage ?? "",
     );
   }
 }
@@ -53,7 +53,7 @@ class _ErrorWidget extends StatelessWidget {
             height: 10,
           ),
           Text(
-            "Something went wrong",
+            message ?? "Something went wrong",
             style: Theme.of(context).textTheme.bodyText2!.copyWith(
                   color: Colors.grey,
                   fontSize: 18,
@@ -62,14 +62,14 @@ class _ErrorWidget extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-          Text(
-            "connection error",
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyText2!.copyWith(
-                  color: Colors.grey,
-                  fontSize: 12,
-                ),
-          ),
+          // Text(
+          //   "connection error",
+          //   textAlign: TextAlign.center,
+          //   style: Theme.of(context).textTheme.bodyText2!.copyWith(
+          //         color: Colors.grey,
+          //         fontSize: 12,
+          //       ),
+          // ),
           Spacer(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,

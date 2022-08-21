@@ -32,8 +32,11 @@ class SortingScreen extends ConsumerWidget with SortingView {
         child: KAScaffold(
             scaffoldKey: _scaffoldKey,
             state: AppState(
-              pageState: controller.pageState,
-            ),
+                noDataMessage: controller.errorMessage,
+                pageState: controller.pageState,
+                onRetry: () {
+                  controller.refresh(context);
+                }),
             appBar: KAppBar(
               backgroundColor: KAColors.appMainLightColor,
               title: const Text("Sorting"),

@@ -7,6 +7,7 @@ import 'package:kaltani_ms/utils/scaffolds_widget/ka_scaffold.dart';
 import '../../logic/controller/collection_controller.dart';
 import '../../logic/manager/controller_manager.dart';
 import '../../logic/model/collection_item_response.dart';
+import '../../utils/amount_formatter.dart';
 import '../../utils/colors.dart';
 import '../../utils/reuseable/KAForm.dart';
 import '../../utils/reuseable/custom_drop_down/ka_dropdown.dart';
@@ -113,7 +114,7 @@ class CollectionScreen extends ConsumerWidget with CollectionView {
                       color: KAColors.appGreyColor),
                 ),
                 Text(
-                  "NGN ${controller.getTotalAmount()}",
+                  "NGN ${amountFormatter(controller.getTotalAmount())}",
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headline1!.copyWith(
                       fontSize: 25,

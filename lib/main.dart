@@ -94,8 +94,9 @@ class _ThemeWidgetState extends State<ThemeWidget> {
 
   updateDeviceID(String fcmToken) async {
     var data = await getUserData();
-    log(data.toJson().toString());
-    if (data.user != null && data.user?.deviceId != fcmToken) {
+
+    if (data?.user != null && data?.user?.deviceId != fcmToken) {
+      log("${data?.toJson()}");
       SettingRepository.updateDevice({"device_id": fcmToken});
     }
   }
