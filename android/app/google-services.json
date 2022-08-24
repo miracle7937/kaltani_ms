@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "814660348733",
+    "project_id": "kaltani-ms",
+    "storage_bucket": "kaltani-ms.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:814660348733:android:7d4a6649f80859819d7354",
+        "android_client_info": {
+          "package_name": "com.kaltani.ms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "814660348733-avnlomss7esdlbgrcqdg7k4jfe3samj5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUaU5DjM7jeCqc3blHLgbP3O2mIVDqoQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "814660348733-avnlomss7esdlbgrcqdg7k4jfe3samj5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
