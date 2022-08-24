@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kaltani.ms">
+    package="com.enkwave.kaltanimis">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="kaltani_ms"
+        android:label="Kaltani MIS"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

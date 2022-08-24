@@ -15,6 +15,7 @@ import 'package:kaltani_ms/utils/reuseable/custom_snack_bar.dart';
 
 import 'logic/local_storage.dart';
 import 'logic/network/repository/setting_repository.dart';
+import 'firebase_options.dart';
 
 Future<void> _messageHandler(RemoteMessage message) async {
   print('background message MIMI ${message.notification!.body}');
@@ -22,7 +23,9 @@ Future<void> _messageHandler(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  FirebaseMessaging.onBackgroundMessage(_messageHandler);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(const ProviderScope(
     child: MyApp(),
@@ -65,7 +68,7 @@ class _ThemeWidgetState extends State<ThemeWidget> {
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.top]);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
