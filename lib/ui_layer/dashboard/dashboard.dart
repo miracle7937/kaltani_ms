@@ -204,7 +204,7 @@ class _DashBoardState extends State<DashBoard> {
                                   .textTheme
                                   .headline6!
                                   .copyWith(
-                                      fontSize: 15,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w400,
                                       color: KAColors.appGreyColor),
                             ),
