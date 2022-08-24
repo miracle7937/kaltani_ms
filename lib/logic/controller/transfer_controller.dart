@@ -215,6 +215,10 @@ class TransferController extends ChangeNotifier {
 
   List<KeyValueModel> get getAvailableSortedMaterial {
     List<KeyValueModel> listOfKeyValue = [];
+
+    if (transferItemResponse!.sortedBreakdown == null) {
+      return listOfKeyValue;
+    }
     Map breakDownMap = transferItemResponse!.sortedBreakdown!.toJson();
     transferItemResponse!.transferItem?.forEach((key) {
       var amount = breakDownMap[key.item?.replaceAll(" ", "_")];
