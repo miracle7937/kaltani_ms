@@ -62,7 +62,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.10.0
 
 flutter_icons:
-  image_path: "assets/app_icon.png"
+  image_path: "assets/solid_app_icon.png"
   android: true
   ios: true
 # For information on the generic Dart part of this file, see the
