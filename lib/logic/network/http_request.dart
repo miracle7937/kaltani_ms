@@ -54,14 +54,18 @@ class ServerData {
     if (body != null && body != "") {
       requestBody = body;
     }
-    log(jsonEncode(body));
+    log("BODY: $body");
     log("ROUTE: $route");
+    log("REQUEST: POST");
+
     try {
       final response = await http.post(Uri.parse(route),
           headers: await getHeader(), body: jsonEncode(body));
 
       log('POST ${response.statusCode}');
-      log(response.body);
+      if (kDebugMode) {
+        print(response.body);
+      }
       // not authorize need to sign in
       if (response.statusCode == 401) {
         await clearUser();
@@ -72,19 +76,19 @@ class ServerData {
     } on SocketException {
       return http.Response(
           jsonEncode({
-            "title": "No Internet connection",
+            "message": "No Internet connection",
           }),
           500);
     } on HttpException {
       return http.Response(
           jsonEncode({
-            "title": "Network error",
+            "message": "Network error",
           }),
           500);
     } on FormatException {
       return http.Response(
           jsonEncode({
-            "title": "Bad response format",
+            "message": "Response format error",
           }),
           500);
     }
@@ -97,8 +101,9 @@ class ServerData {
       final headers = await getHeader();
       final response = await http.get(Uri.parse(route), headers: headers);
       log('ROUTE $route');
-      log('POST ${response.statusCode}');
-      log(response.body);
+      log('STATUS CODE ${response.statusCode}');
+      log("REQUEST: GET");
+      log("BODY: ${response.body}");
       if (response.statusCode == 401) {
         await clearUser();
         Get.toNamed('/');
@@ -108,19 +113,19 @@ class ServerData {
     } on SocketException {
       return http.Response(
           jsonEncode({
-            "title": "No Internet connection",
+            "message": "No Internet connection",
           }),
           500);
     } on HttpException {
       return http.Response(
           jsonEncode({
-            "title": "Network error",
+            "message": "Network error",
           }),
           500);
     } on FormatException {
       return http.Response(
           jsonEncode({
-            "title": "Bad response format",
+            "message": "Bad response format",
           }),
           500);
     }
@@ -132,21 +137,6 @@ class ServerData {
     var response = await getVerb(path!);
     var result = await parseResponse(response);
     return HttpData(result);
-    // try {
-    //   var response = await http.get(Uri.parse(path!), headers: header);
-    //   var data = jsonDecode(response.body);
-    //   log(">>>>>>>>>>>>>>>>>>>>>>>RESPONSE>>>>>>>>>>>>>>>>>>");
-    //   log("route: $path \n ${response.body}");
-    //
-    //   if (response.statusCode == 200 || response.statusCode == 201) {
-    //     return HttpData(data);
-    //   } else {
-    //     return HttpData(data);
-    //   }
-    // } catch (e) {
-    //   print('exception get $e');
-    //   return HttpException('something wrong happened');
-    // }
   }
 
   Future<HttpResponse> postData(
@@ -292,6 +282,7 @@ class ServerData {
         throw BadFormatException();
       }
     }
+
     if (response.statusCode < 200 || response.statusCode >= 400) {
       switch (response.statusCode) {
         case 503:
@@ -300,7 +291,7 @@ class ServerData {
         default:
           ServerData().logToSlack(response);
           throw BadRequestException(
-            responseBody['title'] ?? "Something went wrong",
+            responseBody['message'] ?? "Something went wrong",
             0,
           );
       }

@@ -1,6 +1,6 @@
-import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:kaltani_ms/utils/colors.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../null_checker.dart';
 import '../custom_drop_down/cupertino_bottom_sheet.dart';
@@ -14,7 +14,7 @@ _createDialogWidget(
   String buttonText,
   VoidCallback callback, {
   String? image,
-  String? flareAsset,
+  String? lottieAsset,
   bool displayAd = false,
 }) {
   assert(!isEmpty(title));
@@ -34,16 +34,15 @@ _createDialogWidget(
             ),
           ),
           Visibility(
-            visible: isNotEmpty(flareAsset!) || isNotEmpty(image!),
+            visible: isNotEmpty(lottieAsset!) || isNotEmpty(image!),
             child: Padding(
               padding: const EdgeInsets.only(top: 20.0, bottom: 20),
               child: SizedBox(
                 width: 100,
                 height: 100,
-                child: isNotEmpty(flareAsset)
-                    ? FlareActor(
-                        flareAsset,
-                        animation: "Animation",
+                child: isNotEmpty(lottieAsset)
+                    ? Lottie.asset(
+                        lottieAsset,
                         alignment: Alignment.center,
                         fit: BoxFit.contain,
                       )
@@ -118,7 +117,7 @@ Future showBottomSheetDialog<T>(
           buttonText!,
           callback ?? () {},
           image: icon,
-          flareAsset: flareAsset,
+          lottieAsset: flareAsset,
           displayAd: displayAd,
         ));
       });

@@ -8,11 +8,11 @@ saveUser(Map user) async {
   prefs.setString('userData', jsonEncode(user));
 }
 
-Future<AuthResponse> getUserData() async {
+Future<AuthResponse?> getUserData() async {
   SharedPreferences prefs = await SharedPreferences.getInstance();
   dynamic value = prefs.get('userData');
-  var response = jsonDecode(value);
-  return AuthResponse.fromJson(response);
+
+  return value != null ? AuthResponse.fromJson(jsonDecode(value)) : null;
 }
 
 Future<String> getUserToke() async {
@@ -30,6 +30,14 @@ Future<String?> getUserEmail() async {
   dynamic value = prefs.get('userData');
   AuthResponse authResponse = AuthResponse.fromJson(jsonDecode(value));
   return authResponse.user?.email;
+}
+
+Future<String?> getUserRole() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  dynamic value = prefs.get('userData');
+  AuthResponse authResponse = AuthResponse.fromJson(jsonDecode(value));
+  print(authResponse.user?.role?.name);
+  return authResponse.user?.role?.name;
 }
 
 Future<bool> clearUser() async {

@@ -10,9 +10,9 @@ class KeyValueModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['Key'] = this.key;
-    data['Value'] = this.value;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['Key'] = key;
+    data['Value'] = value;
     return data;
   }
 }

@@ -34,15 +34,16 @@ class CollectionData {
   String? createdAt;
   String? updatedAt;
 
-  CollectionData(
-      {this.id,
-      this.item,
-      this.itemWeight,
-      this.location,
-      this.amount,
-      this.userId,
-      this.createdAt,
-      this.updatedAt});
+  CollectionData({
+    this.id,
+    this.item,
+    this.itemWeight,
+    this.location,
+    this.amount,
+    this.userId,
+    this.createdAt,
+    this.updatedAt,
+  });
 
   CollectionData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -65,6 +66,7 @@ class CollectionData {
     data['user_id'] = userId;
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
+
     return data;
   }
 }

@@ -23,6 +23,7 @@ class KAForm extends StatefulWidget {
   final TextEditingController? controller;
   final TextStyle? hintStyle;
   final VoidCallback? callback;
+  final int? maxLines, maxLength;
 
   const KAForm(
       {Key? key,
@@ -50,6 +51,8 @@ class KAForm extends StatefulWidget {
       this.peffixIcon,
       this.callback,
       this.setValue = "",
+      this.maxLines,
+      this.maxLength,
       this.title})
       : super(key: key);
 

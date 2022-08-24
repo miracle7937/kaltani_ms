@@ -2,10 +2,12 @@ class KAImages {
   static String root = "assets";
   static String loader = "$root/loader.json";
   static String errorLottie = "$root/error-lottie.json";
+  static String mainErrorLottie = "$root/error_scaffold.json";
   static String logo = "$root/logo.png";
   static String location = "$root/location.png";
+  static String logout1 = "$root/log_out.png";
 
-  static String successAnimation = "$root/success.flr";
+  static String successAnimation = "$root/success.json";
   static String errorAnimation = "$root/error.flr";
 
   static String collection = "$root/collection.png";

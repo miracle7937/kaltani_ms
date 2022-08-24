@@ -59,7 +59,7 @@ class EPPageStateWidget extends StatelessWidget {
         break;
       case PageState.error:
         pageBody = ErrorSwitcher(
-          message: 'An error has occurred',
+          message: noDataMessage ?? 'An error has occurred',
           onRetry: onRetry,
           error: error,
         );
@@ -123,8 +123,8 @@ class ErrorSwitcher extends StatelessWidget {
   Widget _buildBody() {
     return _ErrorWidget(
       message: message!,
-      onRetry: onRetry!,
-      subMessage: subMessage!,
+      onRetry: onRetry ?? () {},
+      subMessage: subMessage ?? "",
     );
   }
 }
@@ -147,17 +147,18 @@ class _ErrorWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           const Spacer(),
-          // Image.asset(
-          //   IVImages.ivConnection,
-          //   fit: BoxFit.contain,
-          // ),
+          SizedBox(
+            height: 150,
+            width: 150,
+            child: Lottie.asset(KAImages.mainErrorLottie),
+          ),
           const SizedBox(
             height: 10,
           ),
           Text(
-            "Something went wrong",
+            message!,
             style: Theme.of(context).textTheme.bodyText2?.copyWith(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 18,
                 ),
           ),

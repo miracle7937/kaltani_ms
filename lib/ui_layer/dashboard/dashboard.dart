@@ -9,8 +9,12 @@ import 'package:kaltani_ms/utils/greetings.dart';
 import 'package:kaltani_ms/utils/images.dart';
 import 'package:kaltani_ms/utils/scaffolds_widget/ka_scaffold.dart';
 
+import '../../logic/role_util.dart';
 import '../../utils/colors.dart';
 import '../../utils/reuseable/card_bg.dart';
+import '../../utils/reuseable/custom_snack_bar.dart';
+import '../../utils/role_enum.dart';
+import '../auth/change_password_screen.dart';
 import '../pages/collection_screen.dart';
 import '../pages/recycle_screen.dart';
 import '../pages/sales_screen.dart';
@@ -24,6 +28,8 @@ class DashBoard extends StatefulWidget {
 }
 
 class _DashBoardState extends State<DashBoard> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   AuthResponse? _authResponse;
   @override
   void initState() {
@@ -36,11 +42,26 @@ class _DashBoardState extends State<DashBoard> {
     setState(() {});
   }
 
+  void handleClick(String value) {
+    switch (value) {
+      case 'Change password':
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => ChangePasswordScreen()));
+        break;
+      case 'Logout':
+        clearUser();
+        Navigator.pushReplacementNamed(context, "/");
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String firstName = _authResponse?.user?.firstName ?? "";
-    String location = _authResponse?.user?.locations?.name ?? "";
+    String location = _authResponse?.user?.location?.name ?? "";
+    String role = _authResponse?.user?.role?.name ?? "";
     return KAScaffold(
+      scaffoldKey: _scaffoldKey,
       padding: EdgeInsets.zero,
       builder: (_) {
         return Stack(
@@ -91,6 +112,41 @@ class _DashBoardState extends State<DashBoard> {
                         ],
                       ),
                       const Spacer(),
+                      PopupMenuButton<String>(
+                        icon: SizedBox(
+                          width: MediaQuery.of(context).size.height * 0.07,
+                          height: MediaQuery.of(context).size.height * 0.07,
+                          child: Image.asset(KAImages.logout1),
+                        ),
+                        onSelected: handleClick,
+                        itemBuilder: (BuildContext context) {
+                          return {"Change password", 'Logout'}
+                              .map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: Text(choice,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: KAColors.appBlackColor)),
+                            );
+                          }).toList();
+                        },
+                      ),
+                      // InkWell(
+                      //   onTap: () {
+                      //     clearUser();
+                      //     Navigator.pushNamed(context, "/");
+                      //   },
+                      //   child: SizedBox(
+                      //     width: MediaQuery.of(context).size.height * 0.07,
+                      //     height: MediaQuery.of(context).size.height * 0.07,
+                      //     child: Image.asset(KAImages.logout1),
+                      //   ),
+                      // )
                     ],
                   ),
                   const SizedBox(
@@ -99,10 +155,10 @@ class _DashBoardState extends State<DashBoard> {
                   CardBG(
                     body: SizedBox(
                       width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.1,
+                      height: MediaQuery.of(context).size.height * 0.15,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 8),
+                            horizontal: 12, vertical: 15),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -139,6 +195,41 @@ class _DashBoardState extends State<DashBoard> {
                               ],
                             ),
                             const Spacer(),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "Role",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6!
+                                  .copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: KAColors.appGreyColor),
+                            ),
+                            Row(
+                              children: [
+                                const Icon(
+                                  Icons.verified_user_outlined,
+                                  color: Colors.green,
+                                  size: 15,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  role,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headline6!
+                                      .copyWith(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400,
+                                          color: KAColors.appBlackColor),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -189,13 +280,15 @@ class _DashBoardState extends State<DashBoard> {
   _selectableTab(int i) {
     return CardBG(
       callback: () async {
-        if (_list.length - 1 == i) {
-          clearUser();
-          return;
-        }
-
-        Navigator.push(
-            context, MaterialPageRoute(builder: (_) => _list[i].page));
+        Role.get(_list[i].roleList!).then((canView) async {
+          if (canView) {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => _list[i].page));
+          } else {
+            await showSnackBar("Permission not granted", null,
+                key: _scaffoldKey);
+          }
+        });
       },
       color: _list[i].color,
       body: Center(
@@ -220,39 +313,72 @@ class _DashBoardState extends State<DashBoard> {
 
   final List<DashData> _list = [
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.managingDirector,
+          RolesEnum.operationsManager,
+          RolesEnum.admin
+        ],
         page: CollectionScreen(),
         title: "Collect",
         image: KAImages.collection,
         color: const Color.fromRGBO(252, 186, 3, 1)),
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.managingDirector,
+          RolesEnum.operationsManager,
+          RolesEnum.admin
+        ],
         page: SortingScreen(),
         title: "Sorting",
         image: KAImages.sorting,
         color: const Color.fromRGBO(255, 123, 0, 1)),
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.managingDirector,
+          RolesEnum.operationsManager,
+          RolesEnum.admin
+        ],
         title: "Bailing",
         page: BailingScreen(),
         image: KAImages.billing,
         color: const Color.fromRGBO(95, 94, 94, 1)),
     DashData(
+        roleList: [
+          RolesEnum.facilityManager,
+          RolesEnum.inventoryOfficer,
+          RolesEnum.managingDirector,
+          RolesEnum.gMLogistics,
+          RolesEnum.admin
+        ],
         page: const TransferScreen(),
         title: "Transfer",
         image: KAImages.transfer,
         color: const Color.fromRGBO(107, 5, 142, 1)),
     DashData(
+        roleList: [
+          RolesEnum.gMofProduction,
+          RolesEnum.managingDirector,
+          RolesEnum.productionManager,
+          RolesEnum.admin
+        ],
         title: "Recycle",
         page: RecycleScreen(),
         image: KAImages.recycle,
         color: const Color.fromRGBO(0, 206, 120, 1)),
     DashData(
+        roleList: [
+          RolesEnum.salesManager,
+          RolesEnum.managingDirector,
+          RolesEnum.salesOfficer,
+          RolesEnum.admin
+        ],
         title: "Sales",
         page: SalesScreen(),
         image: KAImages.sells,
         color: const Color.fromRGBO(255, 0, 106, 1)),
-    DashData(
-        title: "Log out",
-        image: KAImages.logout,
-        color: const Color.fromRGBO(210, 0, 38, 1)),
   ];
 }
 
@@ -260,5 +386,12 @@ class DashData {
   late final String? title, image;
   late final dynamic page;
   late final Color? color;
-  DashData({this.title, this.image, this.page, this.color});
+  final List<RolesEnum>? roleList;
+  DashData({
+    this.title,
+    this.image,
+    this.page,
+    this.color,
+    this.roleList,
+  });
 }
