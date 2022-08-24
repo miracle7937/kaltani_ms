@@ -9,7 +9,6 @@ import '../../utils/images.dart';
 import '../../utils/reuseable/KAForm.dart';
 import '../../utils/reuseable/custom_snack_bar.dart';
 import '../../utils/reuseable/ka_button.dart';
-import '../../utils/scaffolds_widget/ka_appbar.dart';
 import '../../utils/scaffolds_widget/ka_scaffold.dart';
 import '../../utils/scaffolds_widget/page_state.dart';
 import '../dashboard/dashboard.dart';
@@ -23,7 +22,6 @@ class SignUpPage extends ConsumerWidget with AuthView {
     AuthController authController = ref.watch(authManager);
     authController.setView(this);
     return KAScaffold(
-      appBar: KAppBar(),
       scaffoldKey: _scaffoldKey,
       padding: EdgeInsets.zero,
       builder: (_) => SingleChildScrollView(
