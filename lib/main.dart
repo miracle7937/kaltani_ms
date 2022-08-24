@@ -65,6 +65,7 @@ class _ThemeWidgetState extends State<ThemeWidget> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
