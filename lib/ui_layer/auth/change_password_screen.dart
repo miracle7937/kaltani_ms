@@ -11,6 +11,7 @@ import '../../utils/images.dart';
 import '../../utils/reuseable/KAForm.dart';
 import '../../utils/reuseable/custom_snack_bar.dart';
 import '../../utils/reuseable/ka_button.dart';
+import '../../utils/scaffolds_widget/ka_appbar.dart';
 import '../../utils/scaffolds_widget/ka_scaffold.dart';
 import '../../utils/scaffolds_widget/page_state.dart';
 
@@ -24,6 +25,7 @@ class ChangePasswordScreen extends ConsumerWidget with ChangeAuthView {
         ref.watch(changePasswordManager);
     changePasswordController.setView(this);
     return KAScaffold(
+      appBar: KAppBar(),
       scaffoldKey: _scaffoldKey,
       padding: EdgeInsets.zero,
       builder: (_) => SingleChildScrollView(
