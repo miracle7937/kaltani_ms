@@ -21,9 +21,9 @@ void showErrorSnackBar(String text,
     action: action,
   );
   if (key != null) {
-    key.currentState!.showSnackBar(snackBar);
+    ScaffoldMessenger.of(key.currentContext!).showSnackBar(snackBar);
   } else {
-    Scaffold.of(context).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
 
@@ -52,7 +52,7 @@ Future<void> showSnackBar(String text, BuildContext? context,
         ),
         const Spacer(),
         InkWell(
-            onTap: () => key!.currentState!.hideCurrentSnackBar(),
+            onTap: () => ScaffoldMessenger.of(context!).hideCurrentSnackBar(),
             child: Image.asset(KAImages.closeIcon)),
         const SizedBox(
           width: 10,
@@ -64,14 +64,14 @@ Future<void> showSnackBar(String text, BuildContext? context,
     action: action,
   );
   if (key != null) {
-    key.currentState!.showSnackBar(snackBar);
+    ScaffoldMessenger.of(key.currentContext!).showSnackBar(snackBar);
   } else {
-    Scaffold.of(context!).showSnackBar(snackBar);
+    ScaffoldMessenger.of(context!).showSnackBar(snackBar);
   }
 }
 
 void showInSnackBar(context, {String? value, Color? color}) {
-  Scaffold.of(context).showSnackBar(SnackBar(
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     duration: const Duration(milliseconds: 20000),
     backgroundColor: KAColors.appMainColor,
     content: Row(
