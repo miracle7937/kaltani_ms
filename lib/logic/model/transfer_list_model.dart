@@ -2,7 +2,7 @@ class TransferItemResponse {
   bool? status;
   String? bailed;
   BailedBreakdown? bailedBreakdown;
-  SortedBreakdown? sortedBreakdown;
+  List<SortedBreakdown>? sortedBreakdowns;
   List<Factory>? factory;
   List<CollectionCenter>? collectionCenter;
   List<Items>? items;
@@ -12,7 +12,7 @@ class TransferItemResponse {
   TransferItemResponse(
       {status,
       bailed,
-      bailedBreakdown,
+      bailedBreakdowns,
       factory,
       items,
       transferItem,
@@ -24,9 +24,13 @@ class TransferItemResponse {
     bailedBreakdown = json['bailed_breakdown'] != null
         ? BailedBreakdown.fromJson(json['bailed_breakdown'])
         : null;
-    sortedBreakdown = json['sorted_breakdown'] != null
-        ? SortedBreakdown.fromJson(json['sorted_breakdown'])
-        : null;
+
+    if (json['sorted_breakdown'] != null) {
+      sortedBreakdowns = <SortedBreakdown>[];
+      json['sorted_breakdown'].forEach((v) {
+        sortedBreakdowns!.add(SortedBreakdown.fromJson(v));
+      });
+    }
     if (json['factory'] != null) {
       factory = <Factory>[];
       json['factory'].forEach((v) {
@@ -66,8 +70,9 @@ class TransferItemResponse {
     if (bailedBreakdown != null) {
       data['bailed_breakdown'] = bailedBreakdown!.toJson();
     }
-    if (sortedBreakdown != null) {
-      data['sorted_breakdown'] = sortedBreakdown!.toJson();
+    if (sortedBreakdowns != null) {
+      data['sorted_breakdown'] =
+          sortedBreakdowns!.map((v) => v.toJson()).toList();
     }
     if (factory != null) {
       data['factory'] = factory!.map((v) => v.toJson()).toList();
@@ -91,52 +96,87 @@ class TransferItemResponse {
 }
 
 class SortedBreakdown {
-  int? id;
-  String? others;
-  String? trash;
-  String? caps;
-  String? greenColour;
-  String? cleanClear;
-  String? locationId;
-  String? createdAt;
-  String? updatedAt;
+  String? value;
+  String? key;
 
-  SortedBreakdown(
-      {id,
-      others,
-      trash,
-      greenColour,
-      cleanClear,
-      locationId,
-      createdAt,
-      updatedAt});
+  SortedBreakdown({this.value, this.key});
 
   SortedBreakdown.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    others = json['Others'];
-    trash = json['Trash'];
-    greenColour = json['Green_Colour'];
-    caps = json['Caps'];
-    cleanClear = json['Clean_Clear'];
-    locationId = json['location_id'];
-    createdAt = json['created_at'];
-    updatedAt = json['updated_at'];
+    value = json['value'];
+    key = json['key'];
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['Others'] = others;
-    data['Trash'] = trash;
-    data['Green_Colour'] = greenColour;
-    data['Clean_Clear'] = cleanClear;
-    data['Caps'] = caps;
-    data['location_id'] = locationId;
-    data['created_at'] = createdAt;
-    data['updated_at'] = updatedAt;
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['value'] = this.value;
+    data['key'] = this.key;
     return data;
   }
 }
+
+// class SortedBreakdown {
+//   int? id;
+//   String? others;
+//   String? trash;
+//   String? caps;
+//   String? greenColour;
+//   String? cleanClear;
+//   String? hdpe;
+//   String? ldpe;
+//   String? brown;
+//   String? black;
+//   String? locationId;
+//   String? createdAt;
+//   String? updatedAt;
+//
+//   SortedBreakdown(
+//       {id,
+//       others,
+//       trash,
+//       greenColour,
+//       cleanClear,
+//       locationId,
+//       this.hdpe,
+//       this.ldpe,
+//       this.brown,
+//       this.black,
+//       createdAt,
+//       updatedAt});
+//
+//   SortedBreakdown.fromJson(Map<String, dynamic> json) {
+//     id = json['id'];
+//     others = json['Others'];
+//     trash = json['Trash'];
+//     greenColour = json['Green_Colour'];
+//     caps = json['Caps'];
+//     cleanClear = json['Clean_Clear'];
+//     hdpe = json['hdpe'];
+//     ldpe = json['ldpe'];
+//     brown = json['brown'];
+//     black = json['black'];
+//     locationId = json['location_id'];
+//     createdAt = json['created_at'];
+//     updatedAt = json['updated_at'];
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data['id'] = id;
+//     data['Others'] = others;
+//     data['Trash'] = trash;
+//     data['Green_Colour'] = greenColour;
+//     data['Clean_Clear'] = cleanClear;
+//     data['Caps'] = caps;
+//     data['location_id'] = locationId;
+//     data['hdpe'] = this.hdpe;
+//     data['ldpe'] = this.ldpe;
+//     data['brown'] = this.brown;
+//     data['black'] = this.black;
+//     data['created_at'] = createdAt;
+//     data['updated_at'] = updatedAt;
+//     return data;
+//   }
+// }
 
 class BailedBreakdown {
   int? id;
