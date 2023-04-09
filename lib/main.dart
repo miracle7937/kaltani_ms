@@ -13,12 +13,12 @@ import 'package:kaltani_ms/ui_layer/pages/transfer_screen.dart';
 import 'package:kaltani_ms/utils/colors.dart';
 import 'package:kaltani_ms/utils/reuseable/custom_snack_bar.dart';
 
+import 'firebase_options.dart';
 import 'logic/local_storage.dart';
 import 'logic/network/repository/setting_repository.dart';
-import 'firebase_options.dart';
 
 Future<void> _messageHandler(RemoteMessage message) async {
-  print('background message MIMI ${message.notification!.body}');
+  print('background message  ${message.notification!.body}');
 }
 
 void main() async {

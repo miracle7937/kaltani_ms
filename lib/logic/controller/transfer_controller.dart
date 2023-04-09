@@ -216,19 +216,16 @@ class TransferController extends ChangeNotifier {
   List<KeyValueModel> get getAvailableSortedMaterial {
     List<KeyValueModel> listOfKeyValue = [];
 
-    if (transferItemResponse!.sortedBreakdown == null) {
+    if (transferItemResponse!.sortedBreakdowns == null) {
       return listOfKeyValue;
     }
-    Map breakDownMap = transferItemResponse!.sortedBreakdown!.toJson();
-    transferItemResponse!.transferItem?.forEach((key) {
-      var amount = breakDownMap[key.item?.replaceAll(" ", "_")];
-      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_")) &&
-          amount != "0") {
-        listOfKeyValue.add(KeyValueModel(
-            key: key.item,
-            value: breakDownMap[key.item?.replaceAll(" ", "_")]));
+    transferItemResponse!.sortedBreakdowns!.forEach((element) {
+      if (element.value != "0") {
+        listOfKeyValue
+            .add(KeyValueModel(key: element.key, value: element.value));
       }
     });
+
     return listOfKeyValue;
   }
 
