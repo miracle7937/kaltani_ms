@@ -8,6 +8,7 @@ class CollectionSetData {
   String? transport;
   String? others;
   String? loader;
+  String? type;
 
   CollectionSetData(
       {this.item,
@@ -18,7 +19,8 @@ class CollectionSetData {
       this.pricePerKg,
       this.transport,
       this.others,
-      this.loader});
+      this.loader,
+      this.type});
 
   CollectionSetData.fromJson(Map<String, dynamic> json) {
     item = json['item'];
@@ -30,6 +32,7 @@ class CollectionSetData {
     transport = json["transport"];
     others = json["others"];
     loader = json["loader"];
+    type = json["type"];
   }
 
   Map<String, dynamic> toJson() {
@@ -43,6 +46,7 @@ class CollectionSetData {
     data['transport'] = transport;
     data['others'] = others;
     data['loader'] = loader;
+    data['type'] = type;
     return data;
   }
 }

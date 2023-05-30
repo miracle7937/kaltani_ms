@@ -7,7 +7,7 @@ import '../../logic/model/transfer_list_model.dart';
 import '../colors.dart';
 
 class TransferCard extends StatelessWidget {
-  final TransferHistory? transferData;
+  final History? transferData;
   final VoidCallback? callback;
   const TransferCard({Key? key, this.transferData, this.callback})
       : super(key: key);
@@ -32,7 +32,7 @@ class TransferCard extends StatelessWidget {
                           color: KAColors.appGreyColor),
                     ),
                     const Spacer(),
-                    statusWidget(context, transferData?.status!, () {})
+                    statusWidget(context, transferData?.status, () {})
                   ],
                 ),
                 Row(
@@ -47,7 +47,7 @@ class TransferCard extends StatelessWidget {
                       children: [
                         _tile(context,
                             title: "Collection Center",
-                            value: transferData?.location?.name ?? ""),
+                            value: transferData?.toLocation ?? ""),
                         const SizedBox(
                           height: 25,
                         ),
@@ -60,7 +60,7 @@ class TransferCard extends StatelessWidget {
                           children: [
                             _tile(context,
                                 title: "Factory",
-                                value: transferData?.factory?.name ?? ""),
+                                value: transferData?.fromLocation ?? ""),
                             Text(
                               DateFormat('yMd').format(
                                   DateTime.parse(transferData!.createdAt!)),

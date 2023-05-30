@@ -14,10 +14,16 @@ class APIRoute {
   static String getSorting = "$base/getSorting";
   static String getBailing = "$base/getBailing";
   static String bailing = "$base/bailing";
-  static String transfer = "$base/transfer";
+  static String transferSortedBailed = "$base/transfer-sorted-bailed";
+  static String transferSortedLoose = "$base/transfer-sorted-loose";
+
+  static String transferUnsortedLoose = "$base/transfer-unsorted-loose";
+  static String transferUnsortedBailed = "$base/transfer-unsorted-bailed";
+
   static String transferSorting = "$base/sortingtransfer";
   static String recycle = "$base/recycle";
   static String getTransfer = "$base/getTransfer";
+  static String getHistory = "$base/getHistory";
   static String deviceId = "$base/deviceId";
   static String logToSlack =
       "https://hooks.slack.com/services/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";

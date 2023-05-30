@@ -13,9 +13,11 @@ import '../network/repository/collection_repository.dart';
 class CollectionController extends ChangeNotifier {
   late CollectionView _collectionView;
   List<CollectionData> itemList = [];
+  List<String> collectionType = ["sorted", "unsorted"];
   CollectionData? selectedCollection;
   CollectionSetData collectionSetData = CollectionSetData();
   PageState pageState = PageState.loaded;
+  String? selectedType;
 
   setView(v) {
     _collectionView = v;
@@ -23,6 +25,12 @@ class CollectionController extends ChangeNotifier {
 
   set setCollection(v) {
     selectedCollection = v;
+    notifyListeners();
+  }
+
+  set setCollectionType(v) {
+    collectionSetData.type = v;
+    selectedType = v;
     notifyListeners();
   }
 
@@ -108,7 +116,9 @@ class CollectionController extends ChangeNotifier {
   num isValueEmpty(String? value) => isEmpty(value) ? 0 : num.parse(value!);
 
   clear() {
+    selectedType = null;
     collectionSetData = CollectionSetData();
+    selectedCollection = null;
   }
 }
 

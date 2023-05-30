@@ -69,6 +69,37 @@ class CollectionScreen extends ConsumerWidget with CollectionView {
                         )
                         .toList()),
                 const SizedBox(
+                  height: 20,
+                ),
+                SYDropdownButton<String>(
+                    itemsListTitle: "Collection Type",
+                    iconSize: 22,
+                    value: controller.selectedType,
+                    hint: const Text(""),
+                    isExpanded: true,
+                    underline: const Divider(),
+                    searchMatcher: (item, text) {
+                      return item.contains(text);
+                    },
+                    onChanged: (v) {
+                      controller.setCollectionType = v;
+                    },
+                    items: controller.collectionType
+                        .map(
+                          (e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(
+                                e.toString().toUpperCase(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline1!
+                                    .copyWith(
+                                      color: Colors.black,
+                                    ),
+                              )),
+                        )
+                        .toList()),
+                const SizedBox(
                   height: 10,
                 ),
                 KAForm(
@@ -130,6 +161,9 @@ class CollectionScreen extends ConsumerWidget with CollectionView {
                   onTap: () {
                     controller.collect(context);
                   },
+                ),
+                const SizedBox(
+                  height: 20,
                 ),
               ],
             ),

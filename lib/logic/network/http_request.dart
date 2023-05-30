@@ -5,13 +5,13 @@ import 'dart:io';
 import 'package:async/async.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 import 'package:kaltani_ms/logic/local_storage.dart';
 import 'package:path/path.dart';
 
+import '../../ui_layer/auth/sign_up_page.dart';
 import '../../utils/api_routes.dart';
+import '../../utils/navigator_service.dart';
 import '../../utils/null_checker.dart';
 import 'exceptions.dart';
 
@@ -69,7 +69,11 @@ class ServerData {
       // not authorize need to sign in
       if (response.statusCode == 401) {
         await clearUser();
-        Get.toNamed('/');
+        Navigator.of(NavigationService.navigatorKey.currentContext!)
+            .pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => SignUpPage()),
+          (route) => false,
+        );
         return;
       }
       return response;
@@ -106,7 +110,11 @@ class ServerData {
       log("BODY: ${response.body}");
       if (response.statusCode == 401) {
         await clearUser();
-        Get.toNamed('/');
+        Navigator.of(NavigationService.navigatorKey.currentContext!)
+            .pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => SignUpPage()),
+          (route) => false,
+        );
         return;
       }
       return response;
@@ -203,7 +211,15 @@ class ServerData {
     var data = jsonDecode(await response.stream.bytesToString());
 
     print(response);
-    if (response.statusCode == 401) {}
+    if (response.statusCode == 401) {
+      await clearUser();
+      Navigator.of(NavigationService.navigatorKey.currentContext!)
+          .pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => SignUpPage()),
+        (route) => false,
+      );
+      return;
+    }
     if (response.statusCode == 200 || response.statusCode == 201) {
       print('successful');
       return HttpData(data["data"]);
@@ -237,7 +253,15 @@ class ServerData {
     var response = await request.send();
 
     var data = jsonDecode(await response.stream.bytesToString());
-    if (response.statusCode == 401) {}
+    if (response.statusCode == 401) {
+      await clearUser();
+      Navigator.of(NavigationService.navigatorKey.currentContext!)
+          .pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => SignUpPage()),
+        (route) => false,
+      );
+      return;
+    }
 
     print(response);
     if (response.statusCode == 200 || response.statusCode == 201) {

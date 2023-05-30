@@ -9,8 +9,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:kaltani_ms/ui_layer/auth/sign_up_page.dart';
 import 'package:kaltani_ms/ui_layer/dashboard/dashboard.dart';
-import 'package:kaltani_ms/ui_layer/pages/transfer_screen.dart';
+import 'package:kaltani_ms/ui_layer/pages/transfers/main_transfer_screen.dart';
 import 'package:kaltani_ms/utils/colors.dart';
+import 'package:kaltani_ms/utils/navigator_service.dart';
 import 'package:kaltani_ms/utils/reuseable/custom_snack_bar.dart';
 
 import 'firebase_options.dart';
@@ -83,13 +84,12 @@ class _ThemeWidgetState extends State<ThemeWidget> {
     await Firebase.initializeApp();
     var fcmToken = await FirebaseMessaging.instance.getToken();
     updateDeviceID(fcmToken!);
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
     FirebaseMessaging.onMessage.listen((RemoteMessage event) async {
       log(event.data.toString());
       showSnackBar("Hello", context, key: null);
     });
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
-      Get.to(() => const TransferScreen());
+      Get.to(() => const TransferMainPage());
     });
   }
 
@@ -108,6 +108,7 @@ class _ThemeWidgetState extends State<ThemeWidget> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      navigatorKey: NavigationService.navigatorKey,
       builder: (context, widget) {
         ScreenUtil.init(context);
         return widget!;

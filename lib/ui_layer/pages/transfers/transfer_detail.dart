@@ -5,18 +5,18 @@ import 'package:kaltani_ms/logic/model/transfer_list_model.dart';
 import 'package:kaltani_ms/utils/reuseable/ka_button.dart';
 import 'package:kaltani_ms/utils/scaffolds_widget/page_state.dart';
 
-import '../../logic/controller/transfer_controller.dart';
-import '../../logic/manager/controller_manager.dart';
-import '../../utils/colors.dart';
-import '../../utils/reuseable/card_bg.dart';
-import '../../utils/reuseable/custom_snack_bar.dart';
-import '../../utils/reuseable/status_screen.dart';
-import '../../utils/reuseable/transfer_card.dart';
-import '../../utils/scaffolds_widget/ka_appbar.dart';
-import '../../utils/scaffolds_widget/ka_scaffold.dart';
+import '../../../logic/controller/transfer_controller.dart';
+import '../../../logic/manager/controller_manager.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/reuseable/card_bg.dart';
+import '../../../utils/reuseable/custom_snack_bar.dart';
+import '../../../utils/reuseable/status_screen.dart';
+import '../../../utils/reuseable/transfer_card.dart';
+import '../../../utils/scaffolds_widget/ka_appbar.dart';
+import '../../../utils/scaffolds_widget/ka_scaffold.dart';
 
 class TransferDetail extends ConsumerWidget with OnTransferStatusView {
-  final TransferHistory history;
+  final History history;
   TransferDetail({Key? key, required this.history}) : super(key: key);
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -58,11 +58,16 @@ class TransferDetail extends ConsumerWidget with OnTransferStatusView {
                     ),
                     Row(
                       children: [
-                        _cell(context, "Materials",
-                            controller.getItemList(history).toString()),
+                        Expanded(
+                          flex: 2,
+                          child: _cell(context, "Materials",
+                              controller.getItemList(history).toString()),
+                        ),
                         const Spacer(),
-                        _cell(context, "Weight",
-                            "${controller.getItemWeight(history)}KG")
+                        Expanded(
+                          child: _cell(context, "Weight",
+                              "${controller.getItemWeight(history)}KG"),
+                        )
                       ],
                     ),
                     const SizedBox(
@@ -70,9 +75,13 @@ class TransferDetail extends ConsumerWidget with OnTransferStatusView {
                     ),
                     Row(
                       children: [
-                        _cell(context, "Processed by", "Mr Samuel"),
+                        Expanded(
+                            child: _cell(context, "Processed by",
+                                history.staffName ?? "")),
                         const Spacer(),
-                        _cell(context, "Factory", history.factory!.address!)
+                        Expanded(
+                            child: _cell(
+                                context, "Factory", history.address ?? ""))
                       ],
                     ),
                   ],

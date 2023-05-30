@@ -29,7 +29,8 @@ final recycleManager = ChangeNotifierProvider<RecycleController>((ref) {
   return RecycleController();
 });
 
-final transferManager = ChangeNotifierProvider<TransferController>((ref) {
+final transferManager =
+    ChangeNotifierProvider.autoDispose<TransferController>((ref) {
   return TransferController();
 });
 final bailingManager = ChangeNotifierProvider<BailingController>((ref) {

@@ -18,7 +18,7 @@ import '../auth/change_password_screen.dart';
 import '../pages/collection_screen.dart';
 import '../pages/recycle_screen.dart';
 import '../pages/sales_screen.dart';
-import '../pages/transfer_screen.dart';
+import '../pages/transfers/main_transfer_screen.dart';
 
 class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
@@ -353,7 +353,7 @@ class _DashBoardState extends State<DashBoard> {
           RolesEnum.gMLogistics,
           RolesEnum.admin
         ],
-        page: const TransferScreen(),
+        page: const TransferMainPage(),
         title: "Transfer",
         image: KAImages.transfer,
         color: const Color.fromRGBO(107, 5, 142, 1)),

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaltani_ms/utils/scaffolds_widget/page_state.dart';
 
-import '../../utils/null_checker.dart';
 import '../../utils/string_helper.dart';
 import '../model/key_value_model.dart';
 import '../model/transfer_list_model.dart';
@@ -10,19 +9,31 @@ import '../model/update_transfer_model.dart';
 import '../network/repository/transfer_repository.dart';
 
 class TransferController extends ChangeNotifier {
-  List<TransferHistory> listItem = [];
+  List<History> listItem = [];
   UpdateTransferModel updateTransferModel = UpdateTransferModel();
   TransferItemResponse? transferItemResponse;
   late TransferView _view;
+  late OnTransferHistory _onTransferHistory;
   late OnTransferStatusView _statusView;
   late OnProcessTransfer _onProcessTransferView;
   bool fetch = false;
+  bool isHistoryLoaded = false;
   Map<String, dynamic> bailMaterialData = {};
   String errorMassage = "";
   Map materialData = {};
-  Factory? factory;
-  CollectionCenter? collectionCenter;
+  FactoryLocation? factory;
+  FactoryLocation? collectionCenter;
   PageState pageState = PageState.loaded;
+  TransferType? transferType;
+  String totalTransferWeight = "0";
+
+  setTransactionType(v) {
+    transferType = v;
+  }
+
+  set setTotalTransferWeight(v) {
+    totalTransferWeight = v;
+  }
 
   set onProcessView(v) {
     _onProcessTransferView = v;
@@ -34,6 +45,10 @@ class TransferController extends ChangeNotifier {
 
   set statusView(v) {
     _statusView = v;
+  }
+
+  set onTransferHistoryView(v) {
+    _onTransferHistory = v;
   }
 
   set setCollectionCenter(v) {
@@ -54,6 +69,13 @@ class TransferController extends ChangeNotifier {
     updateTransferModel.reason = v;
   }
 
+  String getUnsortedWeight() {
+    return (transferType == TransferType.bailed
+            ? transferItemResponse?.unsortedBailedTotal
+            : transferItemResponse?.unsortedLooseTotal) ??
+        "0";
+  }
+
   getTransferList(
     BuildContext context,
   ) async {
@@ -70,17 +92,19 @@ class TransferController extends ChangeNotifier {
     requestList(context);
   }
 
+  clearAll() {
+    fetch = false;
+  }
+
   requestList(BuildContext context) {
     TransferRepository.getTransfer().then((value) {
       if (value.status == true) {
-        listItem.clear();
-        listItem.addAll(value.transferHistory!);
         transferItemResponse = value;
       }
       pageState = PageState.loaded;
       fetch = true;
       notifyListeners();
-    }).catchError((v) {
+    }).onError((v, t) {
       errorMassage = v.toString();
       _view.onError(context, errorMassage);
       pageState = PageState.error;
@@ -89,43 +113,53 @@ class TransferController extends ChangeNotifier {
     });
   }
 
-  summitBailed(BuildContext context, WidgetRef ref) {
-    if (factory == null) {
-      _onProcessTransferView.onError(context, "Please select location");
-      return;
-    }
-    if (bailMaterialData.isNotEmpty) {
-      var map = {};
-      map.addAll(bailMaterialData);
-      map.addAll({"item_id": transferItemResponse?.items?.first.id.toString()});
-      map.addAll({"factory_id": factory?.id.toString()});
-      print(map);
-
-      // return;
-      postSortingCall(context, ref, map, forBailedTransfer: true);
-    } else {
-      _onProcessTransferView.onError(context, "Please add items");
-    }
-  }
-
-  submit(BuildContext context, WidgetRef ref, {bool forBailedTransfer = true}) {
-    if (materialData.isNotEmpty) {
-      materialData["item_id"] =
-          transferItemResponse?.items?.first.id.toString();
-      materialData["toLocation"] = collectionCenter?.id.toString();
-
-      postSortingCall(context, ref, materialData,
-          forBailedTransfer: forBailedTransfer);
-    } else {
-      _onProcessTransferView.onError(context, "Please add items");
-    }
-  }
-
-  postSortingCall(BuildContext context, WidgetRef ref, dynamic data,
-      {bool forBailedTransfer = true}) {
+  refreshHistory(BuildContext context) {
     pageState = PageState.loading;
     notifyListeners();
-    TransferRepository.transfer(data, forBailedTransfer).then((value) {
+    isHistoryLoaded = false;
+    getTransferHistory(context);
+  }
+
+  getTransferHistory(BuildContext context) {
+    if (isHistoryLoaded == true) {
+      return;
+    }
+    TransferRepository.getHistory().then((value) {
+      if (value.status == true) {
+        listItem.clear();
+        listItem.addAll(value.history!);
+      }
+      pageState = PageState.loaded;
+      isHistoryLoaded = true;
+      notifyListeners();
+    }).onError((v, t) {
+      errorMassage = v.toString();
+      _onTransferHistory.onError(context, errorMassage);
+      pageState = PageState.loaded;
+      isHistoryLoaded = true;
+      notifyListeners();
+    });
+  }
+
+  summitUnsorted(BuildContext context) {
+    if ((double.parse(totalTransferWeight) <=
+            double.parse(getUnsortedWeight())) &&
+        int.parse(getUnsortedWeight()) <= 0) {
+      _onProcessTransferView.onError(
+          context, "Input weight must exceed total weight.");
+      return;
+    }
+
+    if (factory == null) {
+      _onProcessTransferView.onError(
+          context, "Please selected transfer location");
+      return;
+    }
+    Map data = {"unsorted": totalTransferWeight, "toLocation": factory?.id};
+
+    pageState = PageState.loading;
+    notifyListeners();
+    TransferRepository.transferUnsorted(data, transferType).then((value) {
       pageState = PageState.loaded;
       notifyListeners();
       if (value.status = true) {
@@ -133,9 +167,46 @@ class TransferController extends ChangeNotifier {
       } else {
         _onProcessTransferView.onError(context, value.message!);
       }
-      _onProcessTransferView.onClearUI(ref);
     }).catchError((v) {
-      _onProcessTransferView.onClearUI(ref);
+      _onProcessTransferView.onError(context, v.toString());
+      pageState = PageState.loaded;
+      notifyListeners();
+    });
+  }
+
+  clearUnsorted() {
+    factory = null;
+    totalTransferWeight = "0";
+  }
+
+  submitSortedMaterial(
+    BuildContext context,
+  ) {
+    if (materialData.isNotEmpty && collectionCenter != null) {
+      materialData["toLocation"] = collectionCenter?.id.toString();
+
+      postSortingCall(context, materialData);
+    } else {
+      _onProcessTransferView.onError(
+          context, "Please provide all required field(s)");
+    }
+  }
+
+  postSortingCall(
+    BuildContext context,
+    dynamic data,
+  ) {
+    pageState = PageState.loading;
+    notifyListeners();
+    TransferRepository.transfer(data, transferType).then((value) {
+      pageState = PageState.loaded;
+      notifyListeners();
+      if (value.status = true) {
+        _onProcessTransferView.onSuccess(context, value.message!);
+      } else {
+        _onProcessTransferView.onError(context, value.message!);
+      }
+    }).catchError((v) {
       _onProcessTransferView.onError(context, v.toString());
       pageState = PageState.loaded;
       notifyListeners();
@@ -163,27 +234,23 @@ class TransferController extends ChangeNotifier {
     });
   }
 
-  getItemList(TransferHistory? item) {
-    List<String> item = [];
-    transferItemResponse?.transferItem?.forEach((element) {
-      item.add(element.item ?? "");
-    });
-
-    return item;
+  getItemList(History history) {
+    String? keysString = history.data
+        ?.toJson()
+        .keys
+        .join(", ")
+        .replaceAll("_", " ")
+        .toUpperCase();
+    return keysString;
   }
 
-  getItemWeight(TransferHistory? history) {
-    List<String> item = [];
-    transferItemResponse?.transferItem?.forEach((element) {
-      if (isNotEmpty(element.item)) {
-        item.add(history?.toJson()[dbStringReplacer(element.item)]);
-      }
+  getItemWeight(History history) {
+    int sum = 0;
+    history.data?.toJson().forEach((key, value) {
+      sum += int.parse(value);
     });
-    String value = item
-        .map((value) => int.parse(value))
-        .reduce((value, element) => value + element)
-        .toString();
-    return value;
+
+    return sum;
   }
 
   bool? haveItemsSelectedTransferItem(
@@ -197,34 +264,28 @@ class TransferController extends ChangeNotifier {
     return false;
   }
 
-  List<KeyValueModel> get getAvailableBailingMaterial {
-    List<KeyValueModel> listOfKeyValue = [];
-
-    Map breakDownMap = transferItemResponse!.bailedBreakdown!.toJson();
-    transferItemResponse!.transferItem?.forEach((key) {
-      var amount = breakDownMap[key.item?.replaceAll(" ", "_")];
-      if (breakDownMap.containsKey(key.item?.replaceAll(" ", "_")) &&
-          amount != "0") {
-        listOfKeyValue.add(KeyValueModel(
-            key: key.item,
-            value: breakDownMap[key.item?.replaceAll(" ", "_")]));
-      }
-    });
-    return listOfKeyValue;
-  }
-
   List<KeyValueModel> get getAvailableSortedMaterial {
     List<KeyValueModel> listOfKeyValue = [];
 
-    if (transferItemResponse!.sortedBreakdowns == null) {
+    if (transferItemResponse!.bailedSortedBrakedown == null) {
       return listOfKeyValue;
     }
-    transferItemResponse!.sortedBreakdowns!.forEach((element) {
-      if (element.value != "0") {
-        listOfKeyValue
-            .add(KeyValueModel(key: element.key, value: element.value));
-      }
-    });
+
+    if (transferType == TransferType.bailed) {
+      transferItemResponse!.bailedSortedBrakedown?.forEach((element) {
+        if (element.value != "0") {
+          listOfKeyValue
+              .add(KeyValueModel(key: element.key, value: element.value));
+        }
+      });
+    } else {
+      transferItemResponse!.looseSortedBrakedown?.forEach((element) {
+        if (element.value != "0") {
+          listOfKeyValue
+              .add(KeyValueModel(key: element.key, value: element.value));
+        }
+      });
+    }
 
     return listOfKeyValue;
   }
@@ -249,6 +310,8 @@ class TransferController extends ChangeNotifier {
   }
 }
 
+enum TransferType { bailed, loose }
+
 abstract class OnProcessTransfer {
   onSuccess(BuildContext context, String message);
   onError(BuildContext context, String message);
@@ -261,6 +324,11 @@ abstract class TransferView {
 }
 
 abstract class OnTransferStatusView {
+  onSuccess(BuildContext context, String message);
+  onError(BuildContext context, String message);
+}
+
+abstract class OnTransferHistory {
   onSuccess(BuildContext context, String message);
   onError(BuildContext context, String message);
 }

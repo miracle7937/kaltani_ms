@@ -2,19 +2,19 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../logic/controller/transfer_controller.dart';
-import '../../logic/manager/controller_manager.dart';
-import '../../logic/model/transfer_list_model.dart';
-import '../../utils/colors.dart';
-import '../../utils/reuseable/KAForm.dart';
-import '../../utils/reuseable/custom_drop_down/ka_dropdown.dart';
-import '../../utils/reuseable/custom_snack_bar.dart';
-import '../../utils/reuseable/ka_button.dart';
-import '../../utils/reuseable/status_screen.dart';
-import '../../utils/scaffolds_widget/ka_appbar.dart';
-import '../../utils/scaffolds_widget/ka_scaffold.dart';
-import '../../utils/string_helper.dart';
-import '../ui_logic/sorting_page_logic.dart';
+import '../../../logic/controller/transfer_controller.dart';
+import '../../../logic/manager/controller_manager.dart';
+import '../../../logic/model/transfer_list_model.dart';
+import '../../../utils/colors.dart';
+import '../../../utils/reuseable/KAForm.dart';
+import '../../../utils/reuseable/custom_drop_down/ka_dropdown.dart';
+import '../../../utils/reuseable/custom_snack_bar.dart';
+import '../../../utils/reuseable/ka_button.dart';
+import '../../../utils/reuseable/status_screen.dart';
+import '../../../utils/scaffolds_widget/ka_appbar.dart';
+import '../../../utils/scaffolds_widget/ka_scaffold.dart';
+import '../../../utils/string_helper.dart';
+import '../../ui_logic/sorting_page_logic.dart';
 
 class TransferSortedScreen extends ConsumerWidget with OnProcessTransfer {
   TransferSortedScreen({Key? key}) : super(key: key);
@@ -93,7 +93,7 @@ class TransferSortedScreen extends ConsumerWidget with OnProcessTransfer {
                       const SizedBox(
                         height: 15,
                       ),
-                      SYDropdownButton<CollectionCenter>(
+                      SYDropdownButton<FactoryLocation>(
                           itemsListTitle: "Select Location",
                           iconSize: 22,
                           value: controller.collectionCenter,
@@ -109,7 +109,7 @@ class TransferSortedScreen extends ConsumerWidget with OnProcessTransfer {
                             controller.setCollectionCenter = v;
                           },
                           items:
-                              controller.transferItemResponse?.collectionCenter
+                              controller.transferItemResponse?.locationFactory
                                   ?.map(
                                     (e) => DropdownMenuItem(
                                         value: e,
@@ -166,8 +166,9 @@ class TransferSortedScreen extends ConsumerWidget with OnProcessTransfer {
                       ),
                       KAButton(
                         onTap: () {
-                          controller.submit(context, ref,
-                              forBailedTransfer: false);
+                          controller.submitSortedMaterial(
+                            context,
+                          );
                         },
                         padding: EdgeInsets.zero,
                         title: "Submit",
